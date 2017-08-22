@@ -10,14 +10,16 @@ import trzcina.maplas6.pomoc.Rozne;
 
 public class LuxWatek extends Thread implements SensorEventListener {
 
-    public volatile boolean zakoncz;
-    public volatile int lux;
+    public volatile boolean zakoncz;    //Info czy zakonczyc watek
+    public volatile int lux;            //Natezenie swiatla
 
+    //Konstruktor
     public LuxWatek() {
         zakoncz = false;
         lux = -1;
     }
 
+    //Odczyt swiatla
     @Override
     public void onSensorChanged(SensorEvent event) {
         int luxtmp = Math.round(event.values[0]);
@@ -32,6 +34,7 @@ public class LuxWatek extends Thread implements SensorEventListener {
 
     }
 
+    //Rejestracja odbierania i wyrejestrowanie po zakonczeniu
     @Override
     public void run() {
         SensorManager sensory = (SensorManager)MainActivity.activity.getSystemService(MainActivity.SENSOR_SERVICE);

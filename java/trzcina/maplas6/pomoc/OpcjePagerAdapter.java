@@ -8,6 +8,7 @@ import android.view.View;
 
 import trzcina.maplas6.MainActivity;
 
+//Obsluga zakladek
 public class OpcjePagerAdapter extends PagerAdapter {
 
     public OpcjePagerAdapter() {
@@ -25,6 +26,7 @@ public class OpcjePagerAdapter extends PagerAdapter {
 
     public Object instantiateItem(View collection, int position) {
 
+        //W zaleznosci od zakladki zwracamy odpowiedni widok
         View view = null;
         switch (position) {
             case 0:
@@ -46,6 +48,7 @@ public class OpcjePagerAdapter extends PagerAdapter {
         ((ViewPager) arg0).removeView((View) arg2);
     }
 
+    //W zaleznosci od zakladki zwracamy odpowiedni tytul
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {

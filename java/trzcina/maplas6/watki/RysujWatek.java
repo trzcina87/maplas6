@@ -14,8 +14,8 @@ import trzcina.maplas6.pomoc.Stale;
 @SuppressWarnings("PointlessBooleanExpression")
 public class RysujWatek extends Thread {
 
-    public volatile boolean zakoncz;
-    public volatile boolean odswiez;
+    public volatile boolean zakoncz;        //Info czy zakonczyc watek
+    public volatile boolean odswiez;        //Info czy odswiezyc obraz
     private float density;
 
     public RysujWatek() {
@@ -24,6 +24,7 @@ public class RysujWatek extends Thread {
         density = MainActivity.activity.getResources().getDisplayMetrics().density;
     }
 
+    //Uwalniamy sufrace w razie bledu
     private void zwolnijCanvas(Canvas canvas) {
         if(canvas != null) {
             try {
@@ -34,6 +35,7 @@ public class RysujWatek extends Thread {
         }
     }
 
+    //Pobieramy surface
     private Canvas pobierzCanvas() {
         try {
             Canvas canvas = MainActivity.activity.surface.surfaceholder.lockCanvas();
@@ -43,14 +45,17 @@ public class RysujWatek extends Thread {
         }
     }
 
+    //Rysujemy czarne tlo
     private void rysujTlo(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
     }
 
+    //Rysujemy srodkowe kolo
     private void rysujKola(Canvas canvas) {
         canvas.drawCircle(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y, Stale.SZEROKOSCSRODKOWEGOKOLA * density, Painty.paintczerwonysrodek);
     }
 
+    //Rysujemy kompas na srodku
     private void rysujKompas(Canvas canvas) {
         int katpolozenia = AppService.service.kompaswatek.kat;
         Matrix macierzobrotu = new Matrix();
@@ -61,6 +66,7 @@ public class RysujWatek extends Thread {
         //activity.kompaswatek.ostatninarysowanykatpolozenia = katpolozenia;
     }
 
+    //Rysujemy zawartosc ekranu
     private void odswiezEkran() {
         Canvas canvas = null;
         try {
@@ -74,19 +80,26 @@ public class RysujWatek extends Thread {
                 odswiez = true;
             }
         } catch (Exception e) {
+
+            //Jesli jakis blad to odswiez natychmiast
             odswiez = true;
             zwolnijCanvas(canvas);
         }
     }
 
+    //Glowna petla watku
     public void run() {
         while(zakoncz == false) {
+
+            //Gdy mamy cos odswiezyc
             if(odswiez == true) {
                 if (MainActivity.activity.surface.surfaceholder.getSurface().isValid()) {
                     odswiez = false;
                     odswiezEkran();
                 }
             }
+
+            //jesli nie mamy nic rysowac, krotka przerwa
             if(odswiez == false) {
                 Rozne.czekaj(5);
             }

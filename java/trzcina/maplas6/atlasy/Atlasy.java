@@ -9,33 +9,49 @@ import java.util.List;
 
 import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.pomoc.Rozne;
+import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.ustawienia.Ustawienia;
 
 public class Atlasy {
 
+    //Globalna lista atlasow
     public static List<Atlas> atlasy;
 
-    public static void szukajAtlasow() throws IOException {
+    //Szukamy wszystkich atlasow w katalogu z mapami
+    public static void szukajAtlasow() {
         atlasy = new ArrayList<>(50);
         File[] katalogi = new File(Ustawienia.folderzmapami.wartosc).listFiles();
         if(katalogi != null) {
+
+            //Sortujemy atlasy alfabetycznie
             Arrays.sort(katalogi, new Comparator<File>() {
                 @Override
                 public int compare(File file, File t1) {
                     return file.getName().toLowerCase().compareTo(t1.getName().toLowerCase());
                 }
             });
+
+            //Dla kazdego katalogu w katalogu z mapami tworzymy atlas
             for(int i = 0; i < katalogi.length; i++) {
                 if(katalogi[i].isDirectory()) {
+
+                    //Parsowanie atlasu i dodawnie do listy jesli sparsowal sie dobrze
                     Atlas atlas = new Atlas(katalogi[i].getName());
                     MainActivity.activity.ustawInfoPrzygotowanie("Parsuje: " + katalogi[i].getName());
-                    atlas.parsuj();
-                    atlasy.add(atlas);
+                    try {
+                        atlas.parsuj();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if(atlas.stan == Stale.ATLASGOTOWY) {
+                        atlasy.add(atlas);
+                    }
                 }
             }
         }
     }
 
+    //Dodajemy wpisy do spisu atlasow w opjcach
     public static void wczytajDoPol() {
         MainActivity.activity.czyscSpisMap();
         for(int i = 0; i < atlasy.size(); i++) {

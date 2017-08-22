@@ -20,23 +20,27 @@ import trzcina.maplas6.watki.KompasWatek;
 import trzcina.maplas6.watki.LuxWatek;
 import trzcina.maplas6.watki.RysujWatek;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class AppService extends Service {
 
     public static AppService service;
-    private boolean wystartowany;
-    public static volatile int widok = Stale.WIDOKBRAK;
-    public volatile Point srodekekranu;
+    private boolean wystartowany;                           //Czy serwis juz dziala
+    public static volatile int widok = Stale.WIDOKBRAK;     //Zmienna odpowiedzialna za aktualny widok programu (mapa, opcje, wybor plikow itp)
+    public volatile Point srodekekranu;                     //Piksel w ktorym znajduje sie srodek ekranu
 
+    //Watki programu
     public LuxWatek luxwatek;
     public RysujWatek rysujwatek;
     public KompasWatek kompaswatek;
 
+    //Zerowanie watkow
     private void watkiNaNull() {
         luxwatek = null;
         rysujwatek = null;
         kompaswatek = null;
     }
 
+    //Konstruktor
     public AppService() {
         service = this;
         wystartowany = false;
@@ -50,6 +54,7 @@ public class AppService extends Service {
         return null;
     }
 
+    //Tworzymy i startujemy wszystkie watki programu
     private void wystartujWatkiProgramu() {
         luxwatek = new LuxWatek();
         rysujwatek = new RysujWatek();
@@ -60,42 +65,55 @@ public class AppService extends Service {
     }
 
     private void wystartujWatekPrzygotowania() {
+
+        //Watek przygotowawczy dziala w tle i komunikuje sie z Activity
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Rozne.czekaj(100);
+
+                //Tworzymy niezbene katalogi
                 MainActivity.activity.ustawProgressPrzygotowanie(1);
                 MainActivity.activity.ustawInfoPrzygotowanie("Tworze katalogi...");
                 Przygotowanie.utworzKatalogi();
+
+                //Usuwamy stare pliki z kosza
                 MainActivity.activity.ustawProgressPrzygotowanie(2);
                 MainActivity.activity.ustawInfoPrzygotowanie("Usuwam stare pliki...");
                 Przygotowanie.usunKosz();
+
+                //Wczytujemy bitmapy do pamieci
                 MainActivity.activity.ustawProgressPrzygotowanie(3);
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje bitmapy...");
                 Bitmapy.inicjujBitmapy();
+
+                //Wczytujemy dostepne atlasy
                 MainActivity.activity.ustawProgressPrzygotowanie(4);
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje atlasy...");
-                try {
-                    Atlasy.szukajAtlasow();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Atlasy.szukajAtlasow();
+
+                //Przechodzimy do widoku mapy i startujemy watki
                 MainActivity.activity.zakonczPrzygotowanie();
                 wystartujWatkiProgramu();
             }
         }).start();
     }
 
+    //Serwis startuje (po starcie MainActivity)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
+        //Nie uruchmiamy jest juz jest uruchomiony
         if(wystartowany == false) {
             wystartowany = true;
             wystartujWatekPrzygotowania();
         }
+
+        //Nie wzniawiamy serwisu automatycznie
         return START_NOT_STICKY;
     }
 
+    //Czeka na zakonczenie watku
     private void zakonczWatek(Thread watek) {
         watek.interrupt();
         while(watek.isAlive()) {
@@ -106,6 +124,7 @@ public class AppService extends Service {
         }
     }
 
+    //Konczymy watek swiatlomierza
     private void zakonczWatekLux() {
         if(luxwatek != null) {
             luxwatek.zakoncz = true;
@@ -113,6 +132,7 @@ public class AppService extends Service {
         }
     }
 
+    //Konczymy watek rysowania
     private void zakonczWatekRysuj() {
         if(rysujwatek != null) {
             rysujwatek.zakoncz = true;
@@ -120,6 +140,7 @@ public class AppService extends Service {
         }
     }
 
+    //Konczymy watek kompasu
     private void zakonczWatekKompas() {
         if(kompaswatek != null) {
             kompaswatek.zakoncz = true;
@@ -127,12 +148,14 @@ public class AppService extends Service {
         }
     }
 
+    //Konczymy uruchomione watki
     private void zakonczWatki() {
         zakonczWatekLux();
         zakonczWatekRysuj();
         zakonczWatekKompas();
     }
 
+    //Zakonczenie apliakcji, konczymy watki, zerujemy zmienne i pokazujemy komunikat
     @Override
     public void onDestroy() {
         super.onDestroy();

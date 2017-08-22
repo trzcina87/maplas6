@@ -3,19 +3,21 @@ package trzcina.maplas6.pomoc;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import trzcina.maplas6.MainActivity;
+
+@SuppressWarnings("PointlessBooleanExpression")
 public class Przygotowanie {
 
+    //Tworzy katalog niezbedne dla programu
     public static void utworzKatalogi() {
-        File glownykatalog = new File(Stale.SCIEZKAMAPLAS);
-        File koszkatalog = new File(Stale.SCIEZKAMAPLAS + Stale.FOLDERKOSZ);
-        if(glownykatalog.exists() == false) {
-            glownykatalog.mkdir();
-        }
-        if(koszkatalog.exists() == false) {
-            koszkatalog.mkdir();
+        boolean katalog1 = Rozne.utworzKatalog(Stale.SCIEZKAMAPLAS);
+        boolean katalog2 = Rozne.utworzKatalog(Stale.SCIEZKAMAPLAS + Stale.FOLDERKOSZ);
+        if((katalog1 == false) || (katalog2 == false)) {
+            MainActivity.activity.zakonczCalaAplikacje();
         }
     }
 
+    //Czysci stare pliki z kosza
     public static void usunKosz() {
         File[] plikigpx = new File(Stale.SCIEZKAMAPLAS + Stale.FOLDERKOSZ + "/").listFiles(new FilenameFilter() {
             @Override

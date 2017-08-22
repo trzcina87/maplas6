@@ -10,11 +10,12 @@ import trzcina.maplas6.MainActivity;
 @SuppressWarnings("PointlessBooleanExpression")
 public class UstawienieString {
 
-    public String wartoscdomyslna;
-    public String wartosc;
-    public String nazwaustawienia;
-    public View polewopjach;
+    public String wartoscdomyslna;      //Wartosc domyslna konfiguracji
+    public String wartosc;              //Wartosc obecna konfiguracji
+    public String nazwaustawienia;      //Nazwa pod ktora zapisane bedzie ustawienie
+    public View polewopjach;            //Widok odpowiedziany za ustawienie
 
+    //Konstruktor
     public UstawienieString(String wartoscdomyslna, String wartosc, String nazwaustawienia, View polewopjach) {
         this.wartoscdomyslna = wartoscdomyslna;
         this.wartosc = wartosc;
@@ -22,6 +23,7 @@ public class UstawienieString {
         this.polewopjach = polewopjach;
     }
 
+    //Sprawdzamy czy ustawienie jest zapisane w telefonie w ogole
     public boolean sprawdzCzyJestZapisane() {
         SharedPreferences sharedPref = MainActivity.activity.getSharedPreferences("UST", Context.MODE_PRIVATE);
         String odczytane = sharedPref.getString(nazwaustawienia, null);
@@ -32,6 +34,7 @@ public class UstawienieString {
         }
     }
 
+    //Wczytujemy ustawienie z pamieci telefonu, ewentualnie wartosc domyslna
     public void wczytajZUstawien() {
         if(sprawdzCzyJestZapisane() == true) {
             SharedPreferences sharedPref = MainActivity.activity.getSharedPreferences("UST", Context.MODE_PRIVATE);
@@ -41,6 +44,7 @@ public class UstawienieString {
         }
     }
 
+    //Uzupelnia wartosc w widoku
     public void uzupelnijPoleWOpcjach() {
         wczytajZUstawien();
         if(polewopjach instanceof EditText) {
@@ -48,6 +52,7 @@ public class UstawienieString {
         }
     }
 
+    //Zapisuje wartosc z widoku do telefonu
     public void zapiszDoUstawien() {
         if(polewopjach instanceof EditText) {
             String obecnawartoscwpolu = ((EditText) polewopjach).getText().toString();
@@ -59,6 +64,7 @@ public class UstawienieString {
         }
     }
 
+    //Zapisuje wartosc domyslna jesli nie ma zadenj
     public void zapiszDoUstawienDomyslnaJesliNieMa() {
         if(sprawdzCzyJestZapisane() == false) {
             SharedPreferences sharedPref = MainActivity.activity.getSharedPreferences("UST", Context.MODE_PRIVATE);

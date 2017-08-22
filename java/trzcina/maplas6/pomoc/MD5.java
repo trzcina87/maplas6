@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 
 public class MD5 {
 
+    //Liczymy MD5 stringa
     public static String md5(String tekst) {
         try {
             MessageDigest md5skrot = MessageDigest.getInstance("MD5");

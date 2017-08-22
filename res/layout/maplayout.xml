@@ -15,45 +15,111 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
-    <ImageView
-        android:id="@+id/menuimageview"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/liniaikonnadole"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/menuimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/menu" />
+
+        <ImageView
+            android:id="@+id/zmienmape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/wymianamapy" />
+
+        <ImageView
+            android:id="@+id/znacznikimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/znacznik" />
+
+        <ImageView
+            android:id="@+id/olowekimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/olowek" />
+
+        <ImageView
+            android:id="@+id/mapaimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/mapa" />
+
+        <ImageView
+            android:id="@+id/pomniejszimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/pomniejsz" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/liniaikonnadole"
         android:layout_alignParentStart="true"
-        app:srcCompat="@mipmap/menu" />
+        android:id="@+id/linearLayout">
 
-    <ImageView
-        android:id="@+id/znacznikimageview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/menuimageview"
-        app:srcCompat="@mipmap/znacznik" />
+        <ImageView
+            android:id="@+id/poziominfoimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/info" />
 
-    <ImageView
-        android:id="@+id/olowekimageview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/znacznikimageview"
-        app:srcCompat="@mipmap/olowek" />
+        <ImageView
+            android:id="@+id/hidden1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            app:srcCompat="@mipmap/wymianamapy" />
 
-    <ImageView
-        android:id="@+id/mapaimageview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/olowekimageview"
-        app:srcCompat="@mipmap/mapa" />
+        <ImageView
+            android:id="@+id/hidden2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            app:srcCompat="@mipmap/znacznik" />
 
-    <ImageView
-        android:id="@+id/pomniejszimageview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/mapaimageview"
-        app:srcCompat="@mipmap/pomniejsz" />
+        <ImageView
+            android:id="@+id/hidden3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            app:srcCompat="@mipmap/olowek" />
+
+        <ImageView
+            android:id="@+id/hidden4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            app:srcCompat="@mipmap/mapa" />
+
+        <ImageView
+            android:id="@+id/powiekszimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@mipmap/powieksz" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/luxtextview"

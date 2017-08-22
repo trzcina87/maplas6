@@ -10,6 +10,7 @@ public class Painty {
     public static float density;
     public static Paint paintczerwonysrodek;
 
+    //Inicjuje painty uzywane przez watek rysuj
     public static void inicjujPainty() {
         density = MainActivity.activity.getResources().getDisplayMetrics().density;
         paintczerwonysrodek = new Paint();

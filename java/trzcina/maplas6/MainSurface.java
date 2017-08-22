@@ -16,6 +16,7 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
 
     public SurfaceHolder surfaceholder;
 
+    //Przypisanie zdarzen o zmianie sufrace, tak by reszta programu znala rozmiarkaflay okna
     private void inicjujSurface() {
         surfaceholder = getHolder();
         setOnTouchListener(this);
@@ -68,6 +69,7 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
         inicjujSurface();
     }
 
+    //Dotkniecie palcem na surface
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         return false;
