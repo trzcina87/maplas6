@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/infoitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Informacja"
+        android:visible="true"/>
+    <item
+        android:id="@+id/dzwiekiitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Dźwięki"
+        android:checkable="true"
+        android:visible="true"/>
+    <item
+        android:id="@+id/precyzjagps"
+        android:showAsAction="ifRoom|withText"
+        android:title="Precyzyjny GPS"
+        android:checkable="true"
+        android:visible="true"/>
+    <item
+        android:id="@+id/ustawieniaitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Ustawienia"
+        android:visible="true"/>
+    <item
+        android:id="@+id/resetagpsitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Reset AGPS"
+        android:visible="true"/>
+    <item
+        android:id="@+id/internetitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Internet"
+        android:checkable="true"
+        android:visible="true"/>
+    <item
+        android:id="@+id/gpsitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="GPS"
+        android:checkable="true"
+        android:visible="true"/>
+
+</menu>

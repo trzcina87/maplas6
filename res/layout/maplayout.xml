@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    tools:context="trzcina.maplas6.MainActivity">
+
+
+    <trzcina.maplas6.MainSurface
+        android:id="@+id/surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <ImageView
+        android:id="@+id/menuimageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@mipmap/menu" />
+
+    <ImageView
+        android:id="@+id/znacznikimageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/menuimageview"
+        app:srcCompat="@mipmap/znacznik" />
+
+    <ImageView
+        android:id="@+id/olowekimageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/znacznikimageview"
+        app:srcCompat="@mipmap/olowek" />
+
+    <ImageView
+        android:id="@+id/mapaimageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/olowekimageview"
+        app:srcCompat="@mipmap/mapa" />
+
+    <ImageView
+        android:id="@+id/pomniejszimageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/mapaimageview"
+        app:srcCompat="@mipmap/pomniejsz" />
+
+    <TextView
+        android:id="@+id/luxtextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:textColor="@android:color/white"
+        android:paddingTop="24dp"
+        android:text="" />
+
+</RelativeLayout>
