@@ -64,6 +64,13 @@ public class UstawienieString {
         }
     }
 
+    public void zapiszWartoscDoUstawien() {
+        SharedPreferences sharedPref = MainActivity.activity.getSharedPreferences("UST", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(nazwaustawienia, wartosc);
+        editor.commit();
+    }
+
     //Zapisuje wartosc domyslna jesli nie ma zadenj
     public void zapiszDoUstawienDomyslnaJesliNieMa() {
         if(sprawdzCzyJestZapisane() == false) {

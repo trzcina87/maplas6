@@ -3,13 +3,24 @@ package trzcina.maplas6.pomoc;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.MenuItem;
 
+import trzcina.maplas6.AppService;
 import trzcina.maplas6.MainActivity;
+import trzcina.maplas6.MainSurface;
 import trzcina.maplas6.R;
 
 public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
+
+    private String pobierzPamiec() {
+        Runtime runtime = Runtime.getRuntime();
+        long uzyte = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+        long heapm = runtime.maxMemory() / 1048576L;
+        int procent = (int) ((uzyte / (double)heapm) * 100);
+        return new String("Pamięc: " + uzyte + "MB/" + heapm + "MB" + " (" + procent + "%)");
+    }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
@@ -33,7 +44,13 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
 
             //Pozycja w menu: Informacja
             case R.id.infoitem:
-                new AlertDialog.Builder(MainActivity.activity).setIcon(android.R.drawable.ic_dialog_info).setTitle(Komunikaty.INFORMACJA).setMessage(Rozne.pobierzDateBudowania()).setPositiveButton("OK", null).show();
+                String komunikat = "Kompilacja: " + Rozne.pobierzDateBudowania() + Stale.ENTER;
+                komunikat = komunikat + pobierzPamiec() + Stale.ENTER;
+                new AlertDialog.Builder(MainActivity.activity).setIcon(android.R.drawable.ic_dialog_info).setTitle(Komunikaty.INFORMACJA).setMessage(komunikat).setPositiveButton("OK", null).show();
+                return true;
+
+            case R.id.przelaczpogps:
+                AppService.service.przelaczajpogps = ! AppService.service.przelaczajpogps;
                 return true;
         }
         return true;

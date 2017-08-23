@@ -12,6 +12,12 @@
         android:checkable="true"
         android:visible="true"/>
     <item
+        android:id="@+id/przelaczpogps"
+        android:showAsAction="ifRoom|withText"
+        android:title="Przełączaj mapę po GPS"
+        android:checkable="true"
+        android:visible="true"/>
+    <item
         android:id="@+id/precyzjagps"
         android:showAsAction="ifRoom|withText"
         android:title="Precyzyjny GPS"

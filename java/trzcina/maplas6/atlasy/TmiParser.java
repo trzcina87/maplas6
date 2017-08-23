@@ -44,6 +44,8 @@ public class TmiParser {
     public String sciezkatar;               //Sciezka do pliku TAR
     public PointF gpsstart;                 //Poczatkowy skraj GPS
     public PointF gpskoniec;                //Koncowy skraj GPS
+    public Float rozpietoscxgeograficzna;
+    public Float rozpietoscygeograficzna;
 
     public TmiParser(String sciezka) {
         this.sciezka = sciezka;
@@ -389,6 +391,11 @@ public class TmiParser {
         zapiszDrugiPlik();
     }
 
+    private void uzupelnijPolaPomocnicze() {
+        rozpietoscxgeograficzna = gpskoniec.x - gpsstart.x;
+        rozpietoscygeograficzna = gpskoniec.y - gpsstart.y;
+    }
+
     //Parsujemy plik TMI
     public void parsuj() throws IOException {
 
@@ -407,6 +414,7 @@ public class TmiParser {
             parsujMap();
             zapiszCache();
         }
+        uzupelnijPolaPomocnicze();
     }
 
     public boolean weryfikuj() {
@@ -432,6 +440,34 @@ public class TmiParser {
             return false;
         }
         return true;
+    }
+
+    public float obliczWspolrzednaXDlaPixela(int pixel) {
+        float procentmapy = pixel / (float)rozmiarmapy.x;
+        return gpsstart.x + procentmapy * rozpietoscxgeograficzna;
+    }
+
+    public float obliczWspolrzednaYDlaPixela(int pixel) {
+        float procentmapy = pixel / (float)rozmiarmapy.y;
+        return gpskoniec.y - procentmapy * rozpietoscygeograficzna;
+    }
+
+    public int obliczPixelXDlaWspolrzednej(float wspolrzedna) {
+        float procentwspolrzednej = (wspolrzedna - gpsstart.x) / rozpietoscxgeograficzna;
+        return Math.round(procentwspolrzednej * rozmiarmapy.x);
+    }
+
+    public int obliczPixelYDlaWspolrzednej(float wspolrzedna) {
+        float procentwspolrzednej = (wspolrzedna - gpsstart.y) / rozpietoscygeograficzna;
+        return Math.round(rozmiarmapy.y - procentwspolrzednej * rozmiarmapy.y);
+    }
+
+    public boolean czyWspolrzedneWewnatrz(float gpsx, float gpsy) {
+        if((gpsx >= gpsstart.x ) && (gpsx <= gpskoniec.x) && (gpsy >= gpsstart.y) && (gpsy <= gpskoniec.y)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void debugTMI() {

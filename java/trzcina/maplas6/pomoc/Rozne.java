@@ -3,6 +3,8 @@ package trzcina.maplas6.pomoc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
@@ -87,10 +89,42 @@ public class Rozne {
         }
     }
 
+    public static int odczytajZeStrumienia(InputStream plik, int ilosc, byte[] bajty) throws IOException {
+        int przeczytano = 0;
+        while(przeczytano < ilosc) {
+            int przeczytanowprzebiegu = plik.read(bajty, przeczytano, ilosc - przeczytano);
+            if(przeczytanowprzebiegu == -1) {
+                break;
+            }
+            przeczytano = przeczytano + przeczytanowprzebiegu;
+        }
+        return przeczytano;
+    }
+
+    public static byte[] odczytajPlikRAM(RandomAccessFile plik, long przesuniecie, int dlugosc) throws IOException {
+        plik.seek(przesuniecie);
+        byte[] bajty = new byte[dlugosc];
+        int przeczytano = 0;
+        while(przeczytano < dlugosc) {
+            int przeczytanowprzebiegu = plik.read(bajty, przeczytano, dlugosc - przeczytano);
+            if(przeczytanowprzebiegu == -1) {
+                break;
+            }
+            przeczytano = przeczytano + przeczytanowprzebiegu;
+        }
+        return bajty;
+    }
+
     public static String pobierzDateBudowania() {
         Date buildDate = new Date(BuildConfig.TIMESTAMP);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String data = dateFormat.format(buildDate);
         return data;
+    }
+
+    public static float zaokraglij5(float liczba) {
+        double val = liczba * 100000;
+        long vall = Math.round(val);
+        return vall / 100000F;
     }
 }

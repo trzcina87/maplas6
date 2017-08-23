@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/liniaikonnadole"
+        android:paddingTop="12dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
 
@@ -51,7 +52,7 @@
             app:srcCompat="@mipmap/olowek" />
 
         <ImageView
-            android:id="@+id/mapaimageview"
+            android:id="@+id/pokazplikiimageview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -126,6 +127,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:textColor="@android:color/white"
+        android:paddingTop="24dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/gpstextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:textColor="@android:color/white"
         android:paddingTop="24dp"

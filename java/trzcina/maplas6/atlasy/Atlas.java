@@ -34,6 +34,10 @@ public class Atlas {
         }
     }
 
+    public boolean czyWspolrzedneWewnatrz(float gpsx, float gpsy) {
+        return parserytmi.get(parserytmi.size() - 1).czyWspolrzedneWewnatrz(gpsx, gpsy);
+    }
+
     //Parsuje atlas
     public void parsuj() throws IOException {
         stan = Stale.ATLASROBIE;

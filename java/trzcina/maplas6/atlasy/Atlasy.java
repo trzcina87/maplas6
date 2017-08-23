@@ -58,4 +58,13 @@ public class Atlasy {
             MainActivity.activity.dodajPozycjeDoSpisuMap(atlasy.get(i).nazwa);
         }
     }
+
+    public static Atlas znajdzAtlasPoNazwie(String nazwa) {
+        for(int i = 0; i < atlasy.size(); i++) {
+            if(atlasy.get(i).nazwa.equals(nazwa)) {
+                return atlasy.get(i);
+            }
+        }
+        return null;
+    }
 }
