@@ -6,20 +6,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public LinearLayout opcjelayout;
     public LinearLayout contentviewlayout;
     public LinearLayout pokazplikilayout;
+    public LinearLayout projektujlayout;
 
     //Widoki
     public EditText nazwaurzadzenia;
@@ -79,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView pomniejszimageview;
     private ImageView powiekszimageview;
     private ImageView pokazplikiimageview;
+    private ImageView poziominfoimageview;
+    private ImageView projektujimageview;
     public MainSurface surface;
 
     //PokazPliki
@@ -91,6 +99,19 @@ public class MainActivity extends AppCompatActivity {
 
     //Pomocnicze
     private LayoutInflater inflater;
+
+    //Projektuj
+    public LinearLayout projektujprzyciskipion;
+    public LinearLayout projektujprzyciskipoziom;
+    public GridLayout projektujgrid;
+    public Button projektujanuluj;
+    public Button projektujanulujpoziom;
+    public CheckBox projektujcheckbox;
+    public CheckBox projektujcheckboxpoziom;
+    public EditText projektujkomentarz;
+    public EditText projektujkomentarzpoziom;
+    public Button projektujzapisz;
+    public Button projektujzapiszpoziom;
 
     //Dla danego id zasobu (w res/layout) zwraca widok
     private LinearLayout znajdzLinearLayout(int zasob) {
@@ -117,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         opcjelayout = znajdzLinearLayout(R.layout.opcjelayout);
         contentviewlayout = znajdzLinearLayout(R.layout.contentviewlayout);
         pokazplikilayout = znajdzLinearLayout(R.layout.pokazpliki);
+        projektujlayout = znajdzLinearLayout(R.layout.projektujpunkt);
     }
 
     //Wyszukuje wszystkie widoki uzywane w aplikacji
@@ -148,6 +170,19 @@ public class MainActivity extends AppCompatActivity {
         downloaduser = (EditText)opcjezaawansowanelayout.findViewById(R.id.downloaduser);
         downloadpass = (EditText)opcjezaawansowanelayout.findViewById(R.id.downloadpass);
         uploadurl = (EditText)opcjezaawansowanelayout.findViewById(R.id.uploadurl);
+        poziominfoimageview = (ImageView)maplayout.findViewById(R.id.poziominfoimageview);
+        projektujimageview = (ImageView)maplayout.findViewById(R.id.projektujimageview);
+        projektujgrid = (GridLayout)projektujlayout.findViewById(R.id.projektujgrid);
+        projektujprzyciskipion = (LinearLayout)projektujlayout.findViewById(R.id.projektujprzyciskipion);
+        projektujprzyciskipoziom = (LinearLayout)projektujlayout.findViewById(R.id.projektujprzyciskipoziom);
+        projektujanuluj = (Button)projektujlayout.findViewById(R.id.projektujanuluj);
+        projektujanulujpoziom = (Button)projektujlayout.findViewById(R.id.projektujanulujpoziom);
+        projektujcheckbox = (CheckBox)projektujlayout.findViewById(R.id.projektujcheckbox);
+        projektujcheckboxpoziom = (CheckBox)projektujlayout.findViewById(R.id.projektujcheckboxpoziom);
+        projektujkomentarz = (EditText)projektujlayout.findViewById(R.id.projektujkomentarz);
+        projektujkomentarzpoziom = (EditText)projektujlayout.findViewById(R.id.projektujkomentarzpoziom);
+        projektujzapisz = (Button)projektujlayout.findViewById(R.id.projektujzapisz);
+        projektujzapiszpoziom = (Button)projektujlayout.findViewById(R.id.projektujzapiszpoziom);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -312,6 +347,44 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewpager);
     }
 
+    private void usunSlowkoKomentarz(EditText v) {
+        if(v.getText().toString().equals("Komentarz...")) {
+            v.setText("");
+        }
+    }
+
+    private void zapiszProjektuj(String nazwa) {
+        boolean pozycjakursora;
+        String komentarz;
+        if(projektujprzyciskipion.getVisibility() == View.VISIBLE) {
+            pozycjakursora = projektujcheckbox.isChecked();
+            komentarz = projektujkomentarz.getText().toString();
+        } else {
+            pozycjakursora = projektujcheckboxpoziom.isChecked();
+            komentarz = projektujkomentarzpoziom.getText().toString();
+        }
+        komentarz = komentarz.replace("Komentarz...", "");
+        boolean zapis;
+        if(pozycjakursora == true) {
+            zapis = AppService.service.zapiszPunktPozycjaKursora(nazwa, komentarz);
+            if(zapis) {
+                pokazToast("Zapisano: " + nazwa);
+            } else {
+                pokazToast("Blad zapisu!");
+            }
+        } else {
+            zapis = AppService.service.zapiszPunktPozycjaGPS(nazwa, komentarz);
+            if(zapis) {
+                pokazToast("Zapisano: " + nazwa);
+            } else {
+                pokazToast("Blad zapisu! Sprawdz GPS!");
+            }
+        }
+        if(zapis == true) {
+            zamknijPokazPlikiIWrocDoMapy();
+        }
+    }
+
     //Przypisuje akcje do przyciskow
     private void przypiszAkcjeDoWidokow() {
         opcjeanuluj.setOnClickListener(new View.OnClickListener() {
@@ -383,6 +456,54 @@ public class MainActivity extends AppCompatActivity {
                 sciagnijPliki();
             }
         });
+        poziominfoimageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppService.service.zmienPoziomInfo();
+            }
+        });
+        projektujimageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pokazProjektujView();
+            }
+        });
+        projektujanuluj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zamknijProjektujIWrocDoMapy();
+            }
+        });
+        projektujanulujpoziom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zamknijProjektujIWrocDoMapy();
+            }
+        });
+        projektujkomentarz.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                usunSlowkoKomentarz((EditText) v);
+            }
+        });
+        projektujkomentarzpoziom.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                usunSlowkoKomentarz((EditText) v);
+            }
+        });
+        View.OnClickListener akcjazapiszpunkt = new View.OnClickListener() {
+            public void onClick(View v) {
+                zapiszProjektuj((String) v.getTag());
+            }
+        };
+        projektujzapisz.setOnClickListener(akcjazapiszpunkt);
+        projektujzapiszpoziom.setOnClickListener(akcjazapiszpunkt);
+        for(int i = 0; i < projektujgrid.getChildCount(); i++) {
+            if(projektujgrid.getChildAt(i) instanceof ImageView) {
+                projektujgrid.getChildAt(i).setOnClickListener(akcjazapiszpunkt);
+            }
+        }
     }
 
     //Ustawia text dla podanego ImageView w UI watku
@@ -405,6 +526,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void ustawImageView(final ImageView im, final int zasob) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                im.setImageResource(zasob);
+            }
+        });
+    }
+
     //Ustawia info o postepie uruchomienia aplikacji
     public void ustawInfoPrzygotowanie(String komunikat) {
         ustawTextView(textinfoprzygotowanie, komunikat);
@@ -413,6 +543,14 @@ public class MainActivity extends AppCompatActivity {
     //Ustawia postep bara podczas uruchamiania aplikacji
     public void ustawProgressPrzygotowanie(int poziom) {
         ustawProgressBar(progressbarprzygotowanie, poziom);
+    }
+
+    public void pokazIkoneOpisow() {
+        ustawImageView(poziominfoimageview, R.mipmap.info);
+    }
+
+    public void pokazIkoneOpisowWylaczonych() {
+        ustawImageView(poziominfoimageview, R.mipmap.infokrzyz);
     }
 
     //Ustawia wartosc w widoku odpowiedzialnym za swiatlomierz
@@ -483,6 +621,12 @@ public class MainActivity extends AppCompatActivity {
         AppService.widok = Stale.WIDOKMAPA;
     }
 
+    private void zamknijProjektujIWrocDoMapy() {
+        contentviewlayout.removeAllViews();
+        contentviewlayout.addView(maplayout);
+        AppService.widok = Stale.WIDOKMAPA;
+    }
+
     //Zamyka widok startowy i uruchamia widok mapy
     public void zakonczPrzygotowanie() {
         runOnUiThread(new Runnable() {
@@ -536,6 +680,16 @@ public class MainActivity extends AppCompatActivity {
         PlikiGPX.wczytajDoPol();
     }
 
+    public void pokazProjektujView() {
+        projektujkomentarz.setText("Komentarz...");
+        projektujkomentarzpoziom.setText("Komentarz...");
+        projektujcheckbox.setChecked(false);
+        projektujcheckboxpoziom.setChecked(false);
+        AppService.service.widok = Stale.WIDOKPROJEKTUJ;
+        contentviewlayout.removeAllViews();
+        contentviewlayout.addView(projektujlayout, 0);
+    }
+
     private void ustawPolitykeWatku() {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -554,6 +708,7 @@ public class MainActivity extends AppCompatActivity {
         ustawPager();
         przypiszAkcjeDoWidokow();
         utworzMenu();
+        ustawWidokWProjektuj();
         Painty.inicjujPainty();
 
         //Obsluga uprawnien i ustawien
@@ -599,9 +754,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void zmienIloscKolumn(GridLayout grid, int ilosc) {
+        if (grid.getColumnCount() != ilosc) {
+            final int viewsCount = grid.getChildCount();
+            for (int i = 0; i < viewsCount; i++) {
+                View view = grid.getChildAt(i);
+                view.setLayoutParams(new GridLayout.LayoutParams());
+            }
+            grid.setColumnCount(ilosc);
+        }
+    }
+
+    public void ustawWidokWProjektuj() {
+        if(projektujgrid != null) {
+            int orientacja = getResources().getConfiguration().orientation;
+            int szerokoscekranu = getWindowManager().getDefaultDisplay().getWidth();
+            int ilosc = 0;
+            if (orientacja == Configuration.ORIENTATION_PORTRAIT) {
+                zmienIloscKolumn(projektujgrid, 4);
+                ilosc = 4;
+                projektujprzyciskipion.setVisibility(View.VISIBLE);
+                projektujprzyciskipoziom.setVisibility(View.GONE);
+            } else {
+                zmienIloscKolumn(projektujgrid, 7);
+                ilosc = 7;
+                projektujprzyciskipion.setVisibility(View.GONE);
+                projektujprzyciskipoziom.setVisibility(View.VISIBLE);
+            }
+            int szerokoscimage = Math.round((szerokoscekranu - ilosc * 2 * 10) / ilosc);
+            for (int i = 0; i < projektujgrid.getChildCount(); i++) {
+                GridLayout.LayoutParams opisimage = new GridLayout.LayoutParams();
+                opisimage.width = szerokoscimage;
+                opisimage.height = szerokoscimage;
+                opisimage.setMargins(10, 10, 10, 10);
+                View view = projektujgrid.getChildAt(i);
+                view.setLayoutParams(opisimage);
+            }
+        }
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        ustawWidokWProjektuj();
     }
 
     @Override
@@ -621,6 +816,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if(widok == Stale.WIDOKPLIKOW) {
             zamknijPokazPlikiIWrocDoMapy();
+        }
+        if(widok == Stale.WIDOKPROJEKTUJ) {
+            zamknijProjektujIWrocDoMapy();
         }
     }
 }

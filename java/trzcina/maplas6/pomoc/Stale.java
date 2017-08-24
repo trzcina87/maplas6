@@ -14,6 +14,7 @@ public class Stale {
     public static int WIDOKMAPA = 2;
     public static int WIDOKOPCJI = 3;
     public static int WIDOKPLIKOW = 4;
+    public static int WIDOKPROJEKTUJ = 5;
 
     //Stale majace wplyw na rysowanie
     public static int SZEROKOSCSRODKOWEGOKOLA = 3;
@@ -40,4 +41,9 @@ public class Stale {
     public static String DOWNLOADUSER = "readonly";
     public static String DOWNLOADPASS = "ReadOnly2017gpx";
 
+    //Obsluga opisow w mapie
+    public static int OPISYBRAK = 0;
+    public static int OPISYPUNKTY = 1;
+    public static int OPISYNAZWY = 2;
+    public static int OPISYKOMENTARZE = 3;
 }

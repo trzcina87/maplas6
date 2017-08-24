@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:paddingTop="24dp"
+        android:columnCount="4"
+        android:id="@+id/projektujgrid"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:id="@+id/pp1"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Prawdziwek"
+            app:srcCompat="@mipmap/prawdziwek" />
+
+        <ImageView
+            android:id="@+id/pp2"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Rydz"
+            app:srcCompat="@mipmap/rydz" />
+
+        <ImageView
+            android:id="@+id/pp3"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Kania"
+            app:srcCompat="@mipmap/kania" />
+
+        <ImageView
+            android:id="@+id/pp4"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Kurka"
+            app:srcCompat="@mipmap/kurka" />
+
+        <ImageView
+            android:id="@+id/pp5"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Kowal"
+            app:srcCompat="@mipmap/kowal" />
+
+        <ImageView
+            android:id="@+id/pp6"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Piaskowiec"
+            app:srcCompat="@mipmap/piaskowiec" />
+
+        <ImageView
+            android:id="@+id/pp7"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Czarny Lepek"
+            app:srcCompat="@mipmap/czarnylepek" />
+
+        <ImageView
+            android:id="@+id/pp8"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Maslak"
+            app:srcCompat="@mipmap/maslak" />
+
+        <ImageView
+            android:id="@+id/pp9"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Gaska"
+            app:srcCompat="@mipmap/gaska" />
+
+        <ImageView
+            android:id="@+id/pp10"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Kozlarek"
+            app:srcCompat="@mipmap/kozlarek" />
+
+        <ImageView
+            android:id="@+id/pp11"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Poziomka"
+            app:srcCompat="@mipmap/poziomka" />
+
+        <ImageView
+            android:id="@+id/pp12"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Jagoda"
+            app:srcCompat="@mipmap/jagoda" />
+
+        <ImageView
+            android:id="@+id/pp13"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Zurawina"
+            app:srcCompat="@mipmap/zurawina" />
+
+        <ImageView
+            android:id="@+id/pp14"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Jerzyna"
+            app:srcCompat="@mipmap/jerzyna" />
+
+        <ImageView
+            android:id="@+id/pp15"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Parking"
+            app:srcCompat="@mipmap/parking" />
+
+        <ImageView
+            android:id="@+id/pp16"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Atrakcja"
+            app:srcCompat="@mipmap/atrakcja" />
+
+        <ImageView
+            android:id="@+id/pp17"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Pomnik"
+            app:srcCompat="@mipmap/pomnik" />
+
+        <ImageView
+            android:id="@+id/pp18"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Osrodek"
+            app:srcCompat="@mipmap/osrodek" />
+
+        <ImageView
+            android:id="@+id/pp19"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Widok"
+            app:srcCompat="@mipmap/widok" />
+
+        <ImageView
+            android:id="@+id/pp20"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_margin="10px"
+            android:tag="Punkt"
+            app:srcCompat="@mipmap/znacznik2" />
+    </GridLayout>
+
+    <LinearLayout
+        android:id="@+id/projektujprzyciskipion"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingTop="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:text="Komentarz"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/projektujcheckbox"
+                android:text="Pozycja kursora"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:maxLines="1"
+            android:background="@color/siwy"
+            android:id="@+id/projektujkomentarz"
+            android:text="Komentarz..."
+            android:singleLine="true"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:paddingTop="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:text="Anuluj"
+                android:id="@+id/projektujanuluj"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:text="Zapisz"
+                android:id="@+id/projektujzapisz"
+                android:tag="Punkt"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/projektujprzyciskipoziom"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:text="Anuluj"
+            android:id="@+id/projektujanulujpoziom"
+            android:layout_weight="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_weight="2"
+            android:id="@+id/projektujcheckboxpoziom"
+            android:text="Kursor"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:id="@+id/projektujkomentarzpoziom"
+            android:background="@color/siwy"
+            android:text="Komentarz..."
+            android:singleLine="true"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:text="Zapisz"
+            android:id="@+id/projektujzapiszpoziom"
+            android:layout_weight="2"
+            android:tag="Punkt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</LinearLayout>

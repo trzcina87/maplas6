@@ -29,7 +29,7 @@ public class Ustawienia {
         downloadurl = new UstawienieString(Stale.DOWNLOADURL, null, "downloadurl", MainActivity.activity.downloadurl);
         downloadpass = new UstawienieString(Stale.DOWNLOADPASS, null, "downloadpass", MainActivity.activity.downloadpass);
         downloaduser = new UstawienieString(Stale.DOWNLOADUSER, null, "downloaduser", MainActivity.activity.downloaduser);
-        uploadurl = new UstawienieString(Stale.DOWNLOADURL, null, "uploadurl", MainActivity.activity.uploadurl);
+        uploadurl = new UstawienieString(Stale.UPLOADURL, null, "uploadurl", MainActivity.activity.uploadurl);
         ustawienia.add(nazwaurzadzenia);
         ustawienia.add(folderzmapami);
         ustawienia.add(atlas);

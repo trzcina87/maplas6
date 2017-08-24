@@ -63,7 +63,7 @@ public class PlikGPX {
             Node node = lista.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element)node;
-                PunktNaMapie punktnamapie = new PunktNaMapie(Float.parseFloat(element.getAttribute("lon")), Float.parseFloat(element.getAttribute("lat")), pobierzWartoscParametru("nama", element), pobierzWartoscParametru("cmt", element));
+                PunktNaMapie punktnamapie = new PunktNaMapie(Float.parseFloat(element.getAttribute("lon")), Float.parseFloat(element.getAttribute("lat")), pobierzWartoscParametru("name", element), pobierzWartoscParametru("cmt", element));
                 punkty.add(punktnamapie);
             }
         }

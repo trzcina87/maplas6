@@ -35,6 +35,7 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
                 activity.locationmanager.sendExtraCommand("gps", "force_xtra_injection", bundle);
                 activity.locationmanager.sendExtraCommand("gps", "force_time_injection", bundle);*/
                 MainActivity.activity.pokazToast(Komunikaty.RESETAGPS);
+                int b = 4 / 0;
                 return true;
 
             //Pozycja w menu: Ustawienia

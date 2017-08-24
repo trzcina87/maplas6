@@ -2,19 +2,17 @@ package trzcina.maplas6;
 
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.Atlasy;
 import trzcina.maplas6.atlasy.TmiParser;
+import trzcina.maplas6.lokalizacja.GPXPunktLogger;
 import trzcina.maplas6.lokalizacja.PlikiGPX;
 import trzcina.maplas6.pomoc.Bitmapy;
 import trzcina.maplas6.pomoc.Komunikaty;
@@ -37,6 +35,7 @@ public class AppService extends Service {
     public volatile Point pixelnamapienadsrodkiem;         //Pixel na mapie nad ktorym znajduje sie wlasnie srodek ekranu
     public volatile Atlas atlas;
     public volatile TmiParser tmiparser;
+    public volatile int poziominfo;
 
     //Watki programu
     public LuxWatek luxwatek;
@@ -64,6 +63,7 @@ public class AppService extends Service {
         tmiparser = null;
         pixelnamapienadsrodkiem = new Point();
         przelaczajpogps = true;
+        poziominfo = Stale.OPISYPUNKTY;
     }
 
     @Nullable
@@ -116,6 +116,8 @@ public class AppService extends Service {
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje pliki...");
                 PlikiGPX.szukajPlikow();
 
+                GPXPunktLogger.inicjuj();
+
                 //Przechodzimy do widoku mapy i startujemy watki
                 MainActivity.activity.zakonczPrzygotowanie();
                 wystartujWatkiProgramu();
@@ -123,6 +125,28 @@ public class AppService extends Service {
                 pokazPierwszyToast();
             }
         }).start();
+    }
+
+    public void zmienPoziomInfo() {
+        poziominfo = (poziominfo + 1) % 4;
+        if(poziominfo == Stale.OPISYBRAK) {
+            MainActivity.activity.pokazToast("Brak punktow");
+        }
+        if(poziominfo == Stale.OPISYPUNKTY) {
+            MainActivity.activity.pokazToast("Tylko punkty");
+        }
+        if(poziominfo == Stale.OPISYNAZWY) {
+            MainActivity.activity.pokazToast("Punkty i nazwa");
+        }
+        if(poziominfo == Stale.OPISYKOMENTARZE) {
+            MainActivity.activity.pokazToast("Punkty nazwy i opisy");
+        }
+        if(poziominfo == Stale.OPISYBRAK) {
+            MainActivity.activity.pokazIkoneOpisowWylaczonych();
+        } else {
+            MainActivity.activity.pokazIkoneOpisow();
+        }
+        rysujwatek.odswiez = true;
     }
 
     private void pokazPierwszyToast() {
@@ -186,6 +210,26 @@ public class AppService extends Service {
         odswiezUI();
         wczytajwatek.odswiez = true;
         rysujwatek.odswiez = true;
+    }
+
+    public boolean zapiszPunktPozycjaKursora(String nazwa, String komentarz) {
+        if(tmiparser != null) {
+            float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x));
+            float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y));
+            Boolean czyzpias = GPXPunktLogger.zapiszPunkt(gpsx, gpsy, nazwa, komentarz);
+            rysujwatek.odswiez = true;
+            if(czyzpias == true) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public boolean zapiszPunktPozycjaGPS(String nazwa, String komentarz) {
+        return false;
     }
 
     public void wczytajKolejnaMape() {
@@ -344,6 +388,7 @@ public class AppService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        GPXPunktLogger.zakonczPlik();
         zakonczWatki();
         wystartowany = false;
         widok = Stale.WIDOKBRAK;

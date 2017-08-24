@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import trzcina.maplas6.AppService;
 import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.TmiParser;
+import trzcina.maplas6.lokalizacja.GPXPunktLogger;
 import trzcina.maplas6.lokalizacja.PlikiGPX;
 import trzcina.maplas6.lokalizacja.PunktNaMapie;
 import trzcina.maplas6.lokalizacja.PunktWTrasie;
@@ -131,16 +134,48 @@ public class RysujWatek extends Thread {
         }
     }
 
+    private void rysujProstokat(Canvas canvas, Float left, Float top, int width, int height, Paint paint) {
+        canvas.drawRect(left, top, left + width, top + height, paint);
+    }
+
+    private void rysujPunktNaMapie(PunktNaMapie punkt, Canvas canvas, Paint paint, Point pixelnadsrodkiem, float promienpunktu) {
+        int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
+        int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
+        canvas.drawCircle(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, promienpunktu, paint);
+        if(AppService.service.poziominfo >= Stale.OPISYNAZWY) {
+            if(punkt.nazwa != null) {
+                Rect zarys = new Rect();
+                Painty.bialytekst.getTextBounds(punkt.nazwa, 0, punkt.nazwa.length(), zarys);
+                canvas.drawText(punkt.nazwa, AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x - zarys.width() / 2, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y - promienpunktu - 8, Painty.bialytekst);
+            }
+            if(AppService.service.poziominfo >= Stale.OPISYKOMENTARZE) {
+                if(punkt.opis != null) {
+                    Rect zarys = new Rect();
+                    Painty.bialytekst.getTextBounds(punkt.opis, 0, punkt.opis.length(), zarys);
+                    canvas.drawText(punkt.opis, AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x - zarys.width() / 2, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y + promienpunktu + 6 - zarys.top, Painty.bialytekst);
+                }
+            }
+        }
+    }
+
+    private void rysujPunktyObecne(Canvas canvas, Point pixelnadsrodkiem) {
+        float promienpunktu = 4 * Painty.density;
+        for(int i = 0; i < GPXPunktLogger.lista.size(); i++) {
+            if(AppService.service.poziominfo >= Stale.OPISYPUNKTY) {
+                rysujPunktNaMapie(GPXPunktLogger.lista.get(i), canvas, Painty.paintfioletowyokrag, pixelnadsrodkiem, promienpunktu);
+            }
+        }
+    }
+
     private void rysujPunktyGPX(Canvas canvas, Point pixelnadsrodkiem) {
         float promienpunktu = 4 * Painty.density;
         for(int i = 0; i < PlikiGPX.pliki.size(); i++) {
             if(PlikiGPX.pliki.get(i).zaznaczony) {
-                List<PunktNaMapie> lista = PlikiGPX.pliki.get(i).punkty;
-                for (int j = 0; j < lista.size(); j++) {
-                    PunktNaMapie punkt = lista.get(j);
-                    int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
-                    int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
-                    canvas.drawCircle(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, promienpunktu, Painty.paintzielonyokrag);
+                if(AppService.service.poziominfo >= Stale.OPISYPUNKTY) {
+                    List<PunktNaMapie> lista = PlikiGPX.pliki.get(i).punkty;
+                    for (int j = 0; j < lista.size(); j++) {
+                        rysujPunktNaMapie(lista.get(j), canvas, Painty.paintzielonyokrag, pixelnadsrodkiem, promienpunktu);
+                    }
                 }
             }
         }
@@ -204,6 +239,7 @@ public class RysujWatek extends Thread {
                     rysujTrasyGPX(canvas, pixelnadsrodkiem);
                     rysujPunktyGPX(canvas, pixelnadsrodkiem);
                     rysujKola(canvas);
+                    rysujPunktyObecne(canvas, pixelnadsrodkiem);
                     rysujKompas(canvas);
                     zwolnijCanvas(canvas);
                 } else {
@@ -218,6 +254,7 @@ public class RysujWatek extends Thread {
             //Jesli jakis blad to odswiez natychmiast
             odswiez = true;
             zwolnijCanvas(canvas);
+            e.printStackTrace();
         }
     }
 
