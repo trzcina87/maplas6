@@ -17,12 +17,14 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
 
     public SurfaceHolder surfaceholder;
     private Point startprzesuwania;
+    public long ostatnieklikniecie;
 
     //Przypisanie zdarzen o zmianie sufrace, tak by reszta programu znala rozmiarkaflay okna
     private void inicjujSurface() {
         surfaceholder = getHolder();
         startprzesuwania = new Point();
         setOnTouchListener(this);
+        ostatnieklikniecie = 0;
         surfaceholder.addCallback(new SurfaceHolder.Callback(){
 
             @Override
@@ -76,6 +78,14 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
                 AppService.service.poprawPixelNadSrodkiem();
                 AppService.service.odswiezUI();
                 AppService.service.rysujwatek.odswiez = true;
+                AppService.service.przesuwajmapezgps = false;
+                int procent = (int) (0.25F * Math.min(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y));
+                if ((x >= AppService.service.srodekekranu.x - procent) && (x <= AppService.service.srodekekranu.x + procent) && (y >= AppService.service.srodekekranu.y - procent) && (y <= AppService.service.srodekekranu.y + procent)) {
+                    if (System.currentTimeMillis() <= ostatnieklikniecie + 500) {
+                        AppService.service.wysrodkujMapeDoGPS();
+                    }
+                    ostatnieklikniecie = System.currentTimeMillis();
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 AppService.service.pixelnamapienadsrodkiem.offset(startprzesuwania.x - x, startprzesuwania.y - y);
@@ -83,6 +93,7 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
                 AppService.service.odswiezUI();
                 AppService.service.rysujwatek.odswiez = true;
                 startprzesuwania.set(x, y);
+                AppService.service.przesuwajmapezgps = false;
                 break;
         }
         return true;

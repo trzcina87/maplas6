@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import trzcina.maplas6.BuildConfig;
 
@@ -120,6 +121,16 @@ public class Rozne {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String data = dateFormat.format(buildDate);
         return data;
+    }
+
+    public static String formatujDystans(int dystans) {
+        if(dystans < 1000) {
+            return String.format(Locale.getDefault(), "%d", dystans) + "m";
+        } else if (dystans < 100000) {
+            return String.format(Locale.getDefault(), "%.1f", dystans / 1000.0) + "km";
+        } else {
+            return String.format(Locale.getDefault(), "%.0f", dystans / 1000.0) + "km";
+        }
     }
 
     public static float zaokraglij5(float liczba) {

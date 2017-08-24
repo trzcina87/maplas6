@@ -79,6 +79,13 @@
                 android:id="@+id/downloadpass"
                 android:layout_height="wrap_content" />
 
+            <Button
+                android:layout_width="match_parent"
+                android:paddingTop="12dp"
+                android:id="@+id/wyczysccache"
+                android:text="Wyczyść cache"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 

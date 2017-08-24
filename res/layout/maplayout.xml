@@ -142,4 +142,23 @@
         android:paddingTop="24dp"
         android:text="" />
 
+    <TextView
+        android:id="@+id/statussatelity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/imageviewsatelita"
+        android:textColor="@android:color/white"
+        android:paddingTop="24dp"
+        android:text="" />
+
+    <ImageView
+        android:id="@+id/imageviewsatelita"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/luxtextview"
+        android:layout_alignParentTop="true"
+        android:paddingTop="24dp"
+        app:srcCompat="@mipmap/sateligaczerwony" />
+
 </RelativeLayout>

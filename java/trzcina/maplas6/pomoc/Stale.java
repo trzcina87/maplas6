@@ -46,4 +46,6 @@ public class Stale {
     public static int OPISYPUNKTY = 1;
     public static int OPISYNAZWY = 2;
     public static int OPISYKOMENTARZE = 3;
+
+    public static String INSTRUKCJA = "1) Dwukrotkne dotknięcie w trybie mapy na środek powoduje przesunięcie mapy do aktualnej pozycji GPS" + ENTER + ENTER + "2) Kliknięcie na współrzędne GPS powoduje zmianę stylu wyświetlania informacji" + ENTER + ENTER + "3) Cyfra przy kompasie - dokładność, równa 3 jeśli kompas dobrze skalibrowany";
 }

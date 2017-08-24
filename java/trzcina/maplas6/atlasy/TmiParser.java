@@ -3,6 +3,7 @@ package trzcina.maplas6.atlasy;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.location.Location;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -46,6 +47,7 @@ public class TmiParser {
     public PointF gpskoniec;                //Koncowy skraj GPS
     public Float rozpietoscxgeograficzna;
     public Float rozpietoscygeograficzna;
+    public float rozpietoscxwmetrach;
 
     public TmiParser(String sciezka) {
         this.sciezka = sciezka;
@@ -53,6 +55,7 @@ public class TmiParser {
         ustawSciezkiDodatkowe();
         mapstart = -1;
         mapdlugosc = -1;
+        rozpietoscxwmetrach = 0;
         rozszerzenie = null;
         prefix = null;
         startkafla = null;
@@ -391,9 +394,20 @@ public class TmiParser {
         zapiszDrugiPlik();
     }
 
+    private float obliczRozpietoscWMetrach() {
+        Location lok1 = new Location("dummyprovider");
+        Location lok2 = new Location("dummyprovider");
+        lok1.setLongitude(gpsstart.x);
+        lok1.setLatitude(gpsstart.y);
+        lok2.setLongitude(gpskoniec.x);
+        lok2.setLatitude(gpskoniec.y);
+        return lok1.distanceTo(lok2);
+    }
+
     private void uzupelnijPolaPomocnicze() {
         rozpietoscxgeograficzna = gpskoniec.x - gpsstart.x;
         rozpietoscygeograficzna = gpskoniec.y - gpsstart.y;
+        rozpietoscxwmetrach = obliczRozpietoscWMetrach();
     }
 
     //Parsujemy plik TMI

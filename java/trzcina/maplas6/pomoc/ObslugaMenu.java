@@ -1,5 +1,6 @@
 package trzcina.maplas6.pomoc;
 
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -30,12 +31,11 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
             case R.id.resetagpsitem:
                 Bundle extras = new Bundle();
                 extras.putBoolean("all", true);
-                /*MainActivity.activity.locationmanager.sendExtraCommand(LocationManager.GPS_PROVIDER, "delete_aiding_data", extras);
                 Bundle bundle = new Bundle();
-                activity.locationmanager.sendExtraCommand("gps", "force_xtra_injection", bundle);
-                activity.locationmanager.sendExtraCommand("gps", "force_time_injection", bundle);*/
+                AppService.service.locationmanager.sendExtraCommand(LocationManager.GPS_PROVIDER, "delete_aiding_data", extras);
+                AppService.service.locationmanager.sendExtraCommand("gps", "force_xtra_injection", bundle);
+                AppService.service.locationmanager.sendExtraCommand("gps", "force_time_injection", bundle);
                 MainActivity.activity.pokazToast(Komunikaty.RESETAGPS);
-                int b = 4 / 0;
                 return true;
 
             //Pozycja w menu: Ustawienia
@@ -43,10 +43,27 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
                 MainActivity.activity.pokazOpcjeView();
                 return true;
 
+            case R.id.internetitem:
+                MainActivity.activity.pokazToast("Nie zaimplementowane!");
+                return true;
+
+            case R.id.precyzjagps:
+                AppService.service.precyzyjnygps = ! AppService.service.precyzyjnygps;
+                return true;
+
+            case R.id.dzwiekiitem:
+                AppService.service.grajdzwieki = ! AppService.service.grajdzwieki;
+                return true;
+
+            case R.id.gpsitem:
+                AppService.service.wlaczgps = ! AppService.service.wlaczgps;
+                AppService.service.zmianaTrybuGPS();
+                return true;
+
             //Pozycja w menu: Informacja
             case R.id.infoitem:
                 String komunikat = "Kompilacja: " + Rozne.pobierzDateBudowania() + Stale.ENTER;
-                komunikat = komunikat + pobierzPamiec() + Stale.ENTER;
+                komunikat = komunikat + pobierzPamiec() + Stale.ENTER + Stale.ENTER + Stale.INSTRUKCJA;
                 new AlertDialog.Builder(MainActivity.activity).setIcon(android.R.drawable.ic_dialog_info).setTitle(Komunikaty.INFORMACJA).setMessage(komunikat).setPositiveButton("OK", null).show();
                 return true;
 

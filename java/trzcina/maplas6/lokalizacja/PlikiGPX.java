@@ -77,6 +77,15 @@ public class PlikiGPX {
         }
     }
 
+    public static PlikGPX znajdzPoNazwie(String nazwa) {
+        for(int i = 0; i < pliki.size(); i++) {
+            if(pliki.get(i).nazwa.equals(nazwa)) {
+                return pliki.get(i);
+            }
+        }
+        return null;
+    }
+
     public static void znajdzIUsun(String nazwa) {
         PlikGPX plik = null;
         for(int i = 0; i < pliki.size(); i++) {
@@ -112,6 +121,17 @@ public class PlikiGPX {
         if(nazwa.endsWith(".gpx")) {
             PlikGPX plikgpx = new PlikGPX(Stale.SCIEZKAMAPLAS + nazwa);
             plikgpx.parsuj();
+            if(plikgpx.stan == Stale.PLIKGOTOWY) {
+                pliki.add(plikgpx);
+            }
+        }
+    }
+
+    public static void dodatkowoSparsujIZaznacz(String nazwa) {
+        if(nazwa.endsWith(".gpx")) {
+            PlikGPX plikgpx = new PlikGPX(Stale.SCIEZKAMAPLAS + nazwa);
+            plikgpx.parsuj();
+            plikgpx.zaznaczony = true;
             if(plikgpx.stan == Stale.PLIKGOTOWY) {
                 pliki.add(plikgpx);
             }

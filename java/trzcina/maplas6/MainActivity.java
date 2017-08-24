@@ -8,7 +8,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.media.Image;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.ContactsContract;
@@ -35,6 +37,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import trzcina.maplas6.atlasy.Atlasy;
 import trzcina.maplas6.lokalizacja.PlikGPX;
@@ -80,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressbarprzygotowanie;
     private TextView luxtextview;
     private TextView gpstextview;
+    private TextView satelitytextview;
     private ImageView menuimageview;
     private ImageView zmienmageimageview;
     private ImageView pomniejszimageview;
@@ -87,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView pokazplikiimageview;
     private ImageView poziominfoimageview;
     private ImageView projektujimageview;
+    private ImageView satelitaimageview;
     public MainSurface surface;
 
     //PokazPliki
@@ -112,6 +118,12 @@ public class MainActivity extends AppCompatActivity {
     public EditText projektujkomentarzpoziom;
     public Button projektujzapisz;
     public Button projektujzapiszpoziom;
+    public Button wyczysccache;
+
+    public SoundPool soundpula;
+    public AudioManager audiomanager;
+    public int soundfixerror;
+    public int soundfixok;
 
     //Dla danego id zasobu (w res/layout) zwraca widok
     private LinearLayout znajdzLinearLayout(int zasob) {
@@ -183,6 +195,9 @@ public class MainActivity extends AppCompatActivity {
         projektujkomentarzpoziom = (EditText)projektujlayout.findViewById(R.id.projektujkomentarzpoziom);
         projektujzapisz = (Button)projektujlayout.findViewById(R.id.projektujzapisz);
         projektujzapiszpoziom = (Button)projektujlayout.findViewById(R.id.projektujzapiszpoziom);
+        satelitytextview = (TextView)maplayout.findViewById(R.id.statussatelity);
+        satelitaimageview = (ImageView)maplayout.findViewById(R.id.imageviewsatelita);
+        wyczysccache = (Button)opcjezaawansowanelayout.findViewById(R.id.wyczysccache);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -338,6 +353,48 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void wyslijPliki() {
+        int ilezaznaczonych = 0;
+        for(int i = 0; i < spisplikow.getChildCount(); i++) {
+            View view = spisplikow.getChildAt(i);
+            if(view instanceof LinearLayout) {
+                for(int j = 0; j < ((LinearLayout) view).getChildCount(); j++) {
+                    View viewwlayout = ((LinearLayout) view).getChildAt(j);
+                    if(viewwlayout instanceof CheckBox) {
+                        if(((CheckBox) viewwlayout).isChecked()) {
+                            PlikGPX plikgpx = PlikiGPX.znajdzPoNazwie((String) viewwlayout.getTag());
+                            if(plikgpx != null) {
+                                HTTP.wyslijPlik(Ustawienia.uploadurl.wartosc, Ustawienia.downloaduser.wartosc, Ustawienia.downloadpass.wartosc, plikgpx);
+                                ilezaznaczonych = ilezaznaczonych + 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(ilezaznaczonych == 0) {
+            MainActivity.activity.pokazToast("Zaznacz pliki do wysłania!");
+        }
+    }
+
+    public void wyczyscCache() {
+        int ilosc = 0;
+        List<String> listacache = Arrays.asList(fileList());
+        if(listacache != null) {
+            for (int i = 0; i < listacache.size(); i++) {
+                if (listacache.get(i).endsWith(Stale.SUFFIXCACHEDANE)) {
+                    deleteFile(listacache.get(i));
+                    ilosc = ilosc + 1;
+                }
+                if (listacache.get(i).endsWith(Stale.SUFFIXCACHETAB)) {
+                    deleteFile(listacache.get(i));
+                    ilosc = ilosc + 1;
+                }
+            }
+        }
+        pokazToast("Cache wyczyszczony, usuniętych plików: " + ilosc);
+    }
+
     //Ustawia obsluge zakladek z opcjach
     private void ustawPager() {
         OpcjePagerAdapter opcjepageradapter = new OpcjePagerAdapter();
@@ -456,6 +513,12 @@ public class MainActivity extends AppCompatActivity {
                 sciagnijPliki();
             }
         });
+        pokazplikiupload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                wyslijPliki();
+            }
+        });
         poziominfoimageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -504,6 +567,51 @@ public class MainActivity extends AppCompatActivity {
                 projektujgrid.getChildAt(i).setOnClickListener(akcjazapiszpunkt);
             }
         }
+        gpstextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AppService.service.zmienKolorInfo();
+                zmienStylTextView();
+            }
+        });
+        wyczysccache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                wyczyscCache();
+            }
+        });
+    }
+
+
+    private void zmienStylJednegoTextView(TextView tv) {
+        int styl = AppService.service.kolorinfo;
+        if(styl == 0) {
+            tv.setTextColor(Color.WHITE);
+            tv.setBackgroundColor(Color.TRANSPARENT);
+        }
+        if(styl == 1) {
+            tv.setTextColor(Color.RED);
+            tv.setBackgroundColor(Color.TRANSPARENT);
+        }
+        if(styl == 2) {
+            tv.setTextColor(Color.BLACK);
+            tv.setBackgroundColor(Color.TRANSPARENT);
+        }
+        if(styl == 3) {
+            tv.setTextColor(Color.WHITE);
+            tv.setBackgroundColor(Color.BLACK);
+        }
+    }
+
+    private void zmienStylTextView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                zmienStylJednegoTextView(gpstextview);
+                zmienStylJednegoTextView(luxtextview);
+                zmienStylJednegoTextView(satelitytextview);
+            }
+        });
     }
 
     //Ustawia text dla podanego ImageView w UI watku
@@ -562,6 +670,18 @@ public class MainActivity extends AppCompatActivity {
         ustawTextView(gpstextview, text);
     }
 
+    public void ustawSatelityText(String text) {
+        ustawTextView(satelitytextview, text);
+    }
+
+    public void ustawSateliteZielona() {
+        ustawImageView(satelitaimageview, R.mipmap.satelitazielony);
+    }
+
+    public void ustawSateliteCzerwona() {
+        ustawImageView(satelitaimageview, R.mipmap.sateligaczerwony);
+    }
+
     //Konfigruje Menu glowne programu
     private void utworzMenu() {
         final PopupMenu menuglowne = new PopupMenu(MainActivity.this, menuimageview);
@@ -571,7 +691,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 menuglowne.getMenu().findItem(R.id.przelaczpogps).setChecked(AppService.service.przelaczajpogps);
+                menuglowne.getMenu().findItem(R.id.gpsitem).setChecked(AppService.service.wlaczgps);
+                menuglowne.getMenu().findItem(R.id.precyzjagps).setChecked(AppService.service.precyzyjnygps);
+                menuglowne.getMenu().findItem(R.id.dzwiekiitem).setChecked(AppService.service.grajdzwieki);
                 menuglowne.show();
+            }
+        });
+    }
+
+    private float obliczGlosnosc() {
+        float aktualnaglosnosc = (float) audiomanager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        float maxymalnaglosnosc = (float) audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        return aktualnaglosnosc / maxymalnaglosnosc;
+    }
+
+    public void grajDzwiek(final int id) {
+        final float glosnosc = obliczGlosnosc();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                soundpula.play(id, glosnosc, glosnosc, 0, 0, 1.0F);
             }
         });
     }
@@ -708,6 +847,7 @@ public class MainActivity extends AppCompatActivity {
         ustawPager();
         przypiszAkcjeDoWidokow();
         utworzMenu();
+        ustawAudio();
         ustawWidokWProjektuj();
         Painty.inicjujPainty();
 
@@ -752,6 +892,13 @@ public class MainActivity extends AppCompatActivity {
             pokazToast(Komunikaty.BRAKUPRAWNINEN);
             finish();
         }
+    }
+
+    private void ustawAudio() {
+        soundpula = new SoundPool(2, AudioManager.STREAM_ALARM, 0);
+        soundfixerror = soundpula.load(getApplicationContext(), R.raw.fixerror, 1);
+        soundfixok = soundpula.load(getApplicationContext(), R.raw.fixok, 1);
+        audiomanager = (AudioManager)getSystemService(AUDIO_SERVICE);
     }
 
     private void zmienIloscKolumn(GridLayout grid, int ilosc) {

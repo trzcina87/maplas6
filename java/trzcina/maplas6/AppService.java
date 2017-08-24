@@ -3,7 +3,11 @@ package trzcina.maplas6;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Point;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
@@ -12,20 +16,24 @@ import java.util.Locale;
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.Atlasy;
 import trzcina.maplas6.atlasy.TmiParser;
+import trzcina.maplas6.lokalizacja.GPSListener;
+import trzcina.maplas6.lokalizacja.GPXTrasaLogger;
 import trzcina.maplas6.lokalizacja.GPXPunktLogger;
 import trzcina.maplas6.lokalizacja.PlikiGPX;
+import trzcina.maplas6.lokalizacja.PunktWTrasie;
 import trzcina.maplas6.pomoc.Bitmapy;
 import trzcina.maplas6.pomoc.Komunikaty;
 import trzcina.maplas6.pomoc.Przygotowanie;
 import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.ustawienia.Ustawienia;
+import trzcina.maplas6.watki.DzwiekiWatek;
 import trzcina.maplas6.watki.KompasWatek;
 import trzcina.maplas6.watki.LuxWatek;
 import trzcina.maplas6.watki.RysujWatek;
 import trzcina.maplas6.watki.WczytajWatek;
 
-@SuppressWarnings("PointlessBooleanExpression")
+@SuppressWarnings({"PointlessBooleanExpression", "MissingPermission"})
 public class AppService extends Service {
 
     public static AppService service;
@@ -36,14 +44,28 @@ public class AppService extends Service {
     public volatile Atlas atlas;
     public volatile TmiParser tmiparser;
     public volatile int poziominfo;
+    public volatile GPXTrasaLogger obecnatrasa;
+    public volatile boolean czakamnapierwszyfix;
+    public volatile boolean przesuwajmapezgps;
+    public GPSListener gpslistener;
+    public LocationManager locationmanager;
+    public boolean gpszarejestrowany;
+    public volatile int kolorinfo;
+
 
     //Watki programu
     public LuxWatek luxwatek;
     public RysujWatek rysujwatek;
     public KompasWatek kompaswatek;
     public WczytajWatek wczytajwatek;
+    public HandlerThread gpswatek;
+    public Looper loopergps;
+    public DzwiekiWatek dzwiekiwatek;
 
     public volatile boolean przelaczajpogps;
+    public volatile boolean wlaczgps;
+    public volatile boolean precyzyjnygps;
+    public volatile boolean grajdzwieki;
 
     //Zerowanie watkow
     private void watkiNaNull() {
@@ -51,6 +73,9 @@ public class AppService extends Service {
         rysujwatek = null;
         kompaswatek = null;
         wczytajwatek = null;
+        gpswatek = null;
+        loopergps = null;
+        dzwiekiwatek = null;
     }
 
     //Konstruktor
@@ -60,9 +85,18 @@ public class AppService extends Service {
         watkiNaNull();
         srodekekranu = new Point();
         atlas = null;
+        kolorinfo = 0;
         tmiparser = null;
+        gpslistener = null;
+        locationmanager = null;
+        czakamnapierwszyfix = false;
         pixelnamapienadsrodkiem = new Point();
         przelaczajpogps = true;
+        precyzyjnygps = true;
+        wlaczgps = false;
+        grajdzwieki = true;
+        gpszarejestrowany = false;
+        przesuwajmapezgps = false;
         poziominfo = Stale.OPISYPUNKTY;
     }
 
@@ -72,16 +106,109 @@ public class AppService extends Service {
         return null;
     }
 
+    private void wystartujWatekGPS() {
+        gpswatek = new HandlerThread("gpswatek");
+        gpswatek.start();
+        loopergps = gpswatek.getLooper();
+        gpslistener = new GPSListener();
+        gpslistener.zerujZmienne();
+        locationmanager = (LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
+    }
+
+    private void rejestrujGPS() {
+        if(gpszarejestrowany == false) {
+            czakamnapierwszyfix = true;
+            dzwiekiwatek.zagralemblad = false;
+            locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, gpslistener, loopergps);
+            locationmanager.addGpsStatusListener(gpslistener);
+            dzwiekiwatek.czasostatniejlokalizacji = System.currentTimeMillis();
+            gpszarejestrowany = true;
+        }
+    }
+
+    private void wyrejestrujGPS() {
+        if(gpszarejestrowany == true) {
+            locationmanager.removeUpdates(gpslistener);
+            locationmanager.removeGpsStatusListener(gpslistener);
+            czakamnapierwszyfix = false;
+            gpszarejestrowany = false;
+        }
+    }
+
+    public void zmianaTrybuGPS() {
+        if(wlaczgps == true) {
+            gpslistener.zerujZmienne();
+            obecnatrasa = new GPXTrasaLogger();
+            rejestrujGPS();
+        } else {
+            wyrejestrujGPS();
+            if(obecnatrasa != null) {
+                obecnatrasa.zakonczPlik();
+            }
+            gpslistener.zerujZmienne();
+            obecnatrasa = null;
+        }
+        odswiezUI();
+        rysujwatek.odswiez = true;
+    }
+
+    private void wysrodkujDoLokalizacji(Location lokalizacja) {
+        float gpsx = Rozne.zaokraglij5((float) lokalizacja.getLongitude());
+        float gpsy = Rozne.zaokraglij5((float) lokalizacja.getLatitude());
+        int x = tmiparser.obliczPixelXDlaWspolrzednej(gpsx);
+        int y = tmiparser.obliczPixelYDlaWspolrzednej(gpsy);
+        pixelnamapienadsrodkiem.set(x, y);
+        poprawPixelNadSrodkiem();
+        odswiezUI();
+        rysujwatek.odswiez = true;
+    }
+
+    public void zlapalemPierwszyFix() {
+        czakamnapierwszyfix = false;
+        if(tmiparser != null) {
+            Location lokalizacja = czyJestFix();
+            if(lokalizacja != null) {
+                wysrodkujDoLokalizacji(lokalizacja);
+                przesuwajmapezgps = true;
+            }
+        }
+    }
+
+    public void wysrodkujMapeDoGPS() {
+        if(tmiparser != null) {
+            Location lokalizacja = czyJestFix();
+            if(lokalizacja != null) {
+                wysrodkujDoLokalizacji(lokalizacja);
+                przesuwajmapezgps = true;
+            } else {
+                MainActivity.activity.pokazToast("Sprawdz GPS!");
+            }
+        }
+    }
+
+    public void przesunMapeZGPS(Location lokalizacja) {
+        if(tmiparser != null) {
+            if(lokalizacja != null) {
+                wysrodkujDoLokalizacji(lokalizacja);
+            } else {
+                MainActivity.activity.pokazToast("Sprawdz GPS!");
+            }
+        }
+    }
+
     //Tworzymy i startujemy wszystkie watki programu
     private void wystartujWatkiProgramu() {
         luxwatek = new LuxWatek();
         rysujwatek = new RysujWatek();
         kompaswatek = new KompasWatek();
         wczytajwatek = new WczytajWatek();
+        dzwiekiwatek = new DzwiekiWatek();
         luxwatek.start();
         rysujwatek.start();
         kompaswatek.start();
         wczytajwatek.start();
+        dzwiekiwatek.start();
+        wystartujWatekGPS();
     }
 
     private void wystartujWatekPrzygotowania() {
@@ -155,6 +282,7 @@ public class AppService extends Service {
         } else {
             MainActivity.activity.pokazToast(atlas.nazwa);
         }
+        odswiezUI();
     }
 
     public void zaczytajOpcje(boolean zachowajwspolrzene, float gpsx, float gpsy) {
@@ -192,24 +320,101 @@ public class AppService extends Service {
         }
     }
 
+    public Location czyJestFix() {
+        if(wlaczgps == true) {
+            if (gpslistener.ostatnialokalizacjazgps != null) {
+                if (gpslistener.ostatnialokalizacjazgps.getTime() + 10000 >= System.currentTimeMillis()) {
+                    if(precyzyjnygps == true) {
+                        return new Location(gpslistener.ostatnialokalizacjazgps);
+                    } else {
+                        return new Location(gpslistener.ostatnialokalizacja);
+                    }
+                }
+            }
+            if (gpslistener.ostatnialokalizacja != null) {
+                if (gpslistener.ostatnialokalizacja.getTime() + 10000 >= System.currentTimeMillis()) {
+                    return new Location(gpslistener.ostatnialokalizacja);
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean czyJestFixBool() {
+        if(wlaczgps == true) {
+            if (gpslistener.ostatnialokalizacjazgps != null) {
+                if (gpslistener.ostatnialokalizacjazgps.getTime() + 10000 >= System.currentTimeMillis()) {
+                    return true;
+                }
+            }
+            if (gpslistener.ostatnialokalizacja != null) {
+                if (gpslistener.ostatnialokalizacja.getTime() + 10000 >= System.currentTimeMillis()) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
+
     private void odswiezUIGPS() {
         if(tmiparser != null) {
-            float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x));
-            float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y));
-            String gps = String.format(Locale.getDefault(), "%.5f", gpsx) + " " + String.format(Locale.getDefault(), "%.5f", gpsy);
-            MainActivity.activity.ustawGPSText(gps);
+            if(wlaczgps == false) {
+                float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x));
+                float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y));
+                String gps = String.format(Locale.getDefault(), "%.5f", gpsx) + " " + String.format(Locale.getDefault(), "%.5f", gpsy);
+                MainActivity.activity.ustawGPSText(gps);
+            } else {
+                float dystans = obecnatrasa.dlugosctrasy;
+                float odlegloscodpoczatku = obecnatrasa.odlegloscodpoczatku;
+                float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x));
+                float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y));
+                Location lokalizacja = czyJestFix();
+                float odlegloscodkursora = 0;
+                if(lokalizacja != null) {
+                    odlegloscodkursora = PunktWTrasie.zmierzDystans(new PunktWTrasie(gpsx, gpsy), new PunktWTrasie((float)lokalizacja.getLongitude(), (float) lokalizacja.getLatitude()));
+                }
+                MainActivity.activity.ustawGPSText(Rozne.formatujDystans(Math.round(dystans)) + " " + Rozne.formatujDystans(Math.round(odlegloscodpoczatku)) + " " + Rozne.formatujDystans(Math.round(odlegloscodkursora)));
+            }
+        }
+    }
+
+    private void odswiezUISatelity() {
+        MainActivity.activity.ustawSatelityText(gpslistener.iloscaktywnychsatelitow + "/" + gpslistener.iloscsatelitow + " ");
+    }
+
+    private void odswiezUIIkonaSatelity() {
+        if(czyJestFixBool()) {
+            MainActivity.activity.ustawSateliteZielona();
+        } else {
+            MainActivity.activity.ustawSateliteCzerwona();
         }
     }
 
     public void odswiezUI() {
         odswiezUIGPS();
+        odswiezUISatelity();
+        odswiezUIIkonaSatelity();
+    }
+
+    public void zmienKolorInfo() {
+        kolorinfo = (kolorinfo + 1) % 4;
+        rysujwatek.odswiez = true;
     }
 
     public void zmianaSurface(int szerokosc, int wysokosc) {
         srodekekranu.set(szerokosc / 2, wysokosc / 2);
         odswiezUI();
-        wczytajwatek.odswiez = true;
-        rysujwatek.odswiez = true;
+        if(wczytajwatek != null) {
+            wczytajwatek.odswiez = true;
+        }
+        if(rysujwatek != null) {
+            rysujwatek.przeladujkonfiguracje = true;
+            rysujwatek.odswiez = true;
+        }
     }
 
     public boolean zapiszPunktPozycjaKursora(String nazwa, String komentarz) {
@@ -376,23 +581,54 @@ public class AppService extends Service {
         }
     }
 
+
+    //Konczymy watek wczytaj
+    private void zakonczWatekDzwieki() {
+        if(dzwiekiwatek != null) {
+            dzwiekiwatek.zakoncz = true;
+            zakonczWatek(dzwiekiwatek);
+        }
+    }
+
+    private void zakonczWatekGPS() {
+        if(gpswatek != null) {
+            gpswatek.quit();
+            while(gpswatek.isAlive()) {
+                try {
+                    gpswatek.join();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
+
     //Konczymy uruchomione watki
     private void zakonczWatki() {
         zakonczWatekLux();
         zakonczWatekRysuj();
         zakonczWatekKompas();
         zakonczWatekWczytaj();
+        zakonczWatekDzwieki();
+        zakonczWatekGPS();
+    }
+
+    public void zakonczUsluge() {
+        GPXPunktLogger.zakonczPlik();
+        if(obecnatrasa != null) {
+            obecnatrasa.zakonczPlik();
+        }
+        wystartowany = false;
+        widok = Stale.WIDOKBRAK;
+        wyrejestrujGPS();
+        zakonczWatki();
+        Toast.makeText(getApplicationContext(), Komunikaty.KONIECPROGRAMU, Toast.LENGTH_SHORT).show();
     }
 
     //Zakonczenie apliakcji, konczymy watki, zerujemy zmienne i pokazujemy komunikat
     @Override
     public void onDestroy() {
         super.onDestroy();
-        GPXPunktLogger.zakonczPlik();
-        zakonczWatki();
-        wystartowany = false;
-        widok = Stale.WIDOKBRAK;
-        Toast.makeText(getApplicationContext(), Komunikaty.KONIECPROGRAMU, Toast.LENGTH_SHORT).show();
+        zakonczUsluge();
     }
 
     @Override
