@@ -24,7 +24,6 @@ public class Rozne {
         try {
             Thread.sleep(milisekundy);
         } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

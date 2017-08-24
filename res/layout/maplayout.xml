@@ -38,7 +38,7 @@
             app:srcCompat="@mipmap/wymianamapy" />
 
         <ImageView
-            android:id="@+id/znacznikimageview"
+            android:id="@+id/szybkipunkt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -159,6 +159,6 @@
         android:layout_toStartOf="@+id/luxtextview"
         android:layout_alignParentTop="true"
         android:paddingTop="24dp"
-        app:srcCompat="@mipmap/sateligaczerwony" />
+        app:srcCompat="@mipmap/satelitaczerwony" />
 
 </RelativeLayout>

@@ -13,6 +13,7 @@ public class MainApp extends Application {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
                 if(AppService.service != null) {
                     AppService.service.zakonczUsluge();
                 }

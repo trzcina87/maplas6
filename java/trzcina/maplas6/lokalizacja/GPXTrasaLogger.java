@@ -20,6 +20,7 @@ public class GPXTrasaLogger {
     public int dlugosc;
     public float dlugosctrasy;
     public float odlegloscodpoczatku;
+    public long czasstart;
 
     private void utworzNazwe() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss");
@@ -52,6 +53,7 @@ public class GPXTrasaLogger {
         odlegloscodpoczatku = 0;
         utworzNazwe();
         otworzPlik();
+        czasstart = System.currentTimeMillis();
     }
 
     public synchronized boolean zapiszPunkt(float wspx, float wspy) {

@@ -1,7 +1,11 @@
 package trzcina.maplas6;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
@@ -9,6 +13,9 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v7.app.NotificationCompat;
+import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -23,6 +30,7 @@ import trzcina.maplas6.lokalizacja.PlikiGPX;
 import trzcina.maplas6.lokalizacja.PunktWTrasie;
 import trzcina.maplas6.pomoc.Bitmapy;
 import trzcina.maplas6.pomoc.Komunikaty;
+import trzcina.maplas6.pomoc.OdbiorZNotyfikacji;
 import trzcina.maplas6.pomoc.Przygotowanie;
 import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
@@ -30,6 +38,7 @@ import trzcina.maplas6.ustawienia.Ustawienia;
 import trzcina.maplas6.watki.DzwiekiWatek;
 import trzcina.maplas6.watki.KompasWatek;
 import trzcina.maplas6.watki.LuxWatek;
+import trzcina.maplas6.watki.NotyfikacjaWatek;
 import trzcina.maplas6.watki.RysujWatek;
 import trzcina.maplas6.watki.WczytajWatek;
 
@@ -61,11 +70,18 @@ public class AppService extends Service {
     public HandlerThread gpswatek;
     public Looper loopergps;
     public DzwiekiWatek dzwiekiwatek;
+    public NotyfikacjaWatek notyfikacjawatek;
 
     public volatile boolean przelaczajpogps;
     public volatile boolean wlaczgps;
     public volatile boolean precyzyjnygps;
     public volatile boolean grajdzwieki;
+
+    //Notyfikcja
+    public RemoteViews widokmalejnotyfikacji;
+    public NotificationManager notificationmanager;
+    public Notification notyfikacja;
+    public OdbiorZNotyfikacji odbiorznotyfikacji;
 
     //Zerowanie watkow
     private void watkiNaNull() {
@@ -76,6 +92,7 @@ public class AppService extends Service {
         gpswatek = null;
         loopergps = null;
         dzwiekiwatek = null;
+        notyfikacjawatek = null;
     }
 
     //Konstruktor
@@ -98,6 +115,10 @@ public class AppService extends Service {
         gpszarejestrowany = false;
         przesuwajmapezgps = false;
         poziominfo = Stale.OPISYPUNKTY;
+        widokmalejnotyfikacji = null;
+        notificationmanager = null;
+        notyfikacja = null;
+        odbiorznotyfikacji = null;
     }
 
     @Nullable
@@ -203,11 +224,13 @@ public class AppService extends Service {
         kompaswatek = new KompasWatek();
         wczytajwatek = new WczytajWatek();
         dzwiekiwatek = new DzwiekiWatek();
+        notyfikacjawatek = new NotyfikacjaWatek();
         luxwatek.start();
         rysujwatek.start();
         kompaswatek.start();
         wczytajwatek.start();
         dzwiekiwatek.start();
+        notyfikacjawatek.start();
         wystartujWatekGPS();
     }
 
@@ -244,6 +267,7 @@ public class AppService extends Service {
                 PlikiGPX.szukajPlikow();
 
                 GPXPunktLogger.inicjuj();
+                utworzNotyfikacje();
 
                 //Przechodzimy do widoku mapy i startujemy watki
                 MainActivity.activity.zakonczPrzygotowanie();
@@ -417,6 +441,117 @@ public class AppService extends Service {
         }
     }
 
+    private void utworzNotyfikacje() {
+        RemoteViews widoknotyfikacji = new RemoteViews(getApplicationContext().getPackageName(), R.layout.notyfikacjalayout);
+        int ikonywlayout[] = {R.id.icon0, R.id.icon1, R.id.icon2, R.id.icon3, R.id.icon4, R.id.icon5, R.id.icon6, R.id.icon7, R.id.icon8, R.id.icon9, R.id.icon10, R.id.icon11, R.id.icon12, R.id.icon13, R.id.icon14, R.id.icon15, R.id.icon16, R.id.icon17, R.id.icon18, R.id.icon19};
+        int ikony[] = {R.mipmap.prawdziwek, R.mipmap.rydz, R.mipmap.kania, R.mipmap.kurka, R.mipmap.kowal, R.mipmap.piaskowiec, R.mipmap.czarnylepek, R.mipmap.maslak, R.mipmap.gaska, R.mipmap.kozlarek, R.mipmap.poziomka, R.mipmap.jagoda, R.mipmap.zurawina, R.mipmap.jerzyna, R.mipmap.parking, R.mipmap.atrakcja, R.mipmap.pomnik, R.mipmap.osrodek, R.mipmap.widok, R.mipmap.znacznik2};
+        String opisy[] = {"Prawdziwek", "Rydz", "Kania", "Kurka", "Kowal", "Piaskowiec", "Czarny Lepek", "Maslak", "Gaska", "Kozlarek", "Poziomka", "Jagoda", "Zurawina", "Jerzyna", "Parking", "Atrakcja", "Pomnik", "Osrodek", "Widok", "Punkt"};
+        for(int i = 0; i < 20; i++) {
+            widoknotyfikacji.setImageViewResource(ikonywlayout[i], ikony[i]);
+        }
+        Intent intenty[] = new Intent[ikony.length];
+        PendingIntent pendingintenty[] = new PendingIntent[ikony.length];
+        for(int i = 0; i < ikony.length; i++) {
+            intenty[i] = new Intent(opisy[i]);
+            pendingintenty[i] = PendingIntent.getBroadcast(this, 0, intenty[i], 0);
+            widoknotyfikacji.setOnClickPendingIntent(ikonywlayout[i], pendingintenty[i]);
+        }
+        widokmalejnotyfikacji = new RemoteViews(getApplicationContext().getPackageName(), R.layout.notyfikacjasmalllayout);
+        widokmalejnotyfikacji.setImageViewResource(R.id.notlassmall, R.mipmap.ikona);
+        widokmalejnotyfikacji.setImageViewResource(R.id.znaczniksmall, R.mipmap.znacznik2);
+        widokmalejnotyfikacji.setImageViewResource(R.id.notyfikacjaikonasatelity, R.mipmap.satelitaczerwony);
+        widokmalejnotyfikacji.setOnClickPendingIntent(R.id.znaczniksmall, pendingintenty[19]);
+        NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.mipmap.ikona);
+        builder = (NotificationCompat.Builder) builder.setCustomBigContentView(widoknotyfikacji).setContent(widokmalejnotyfikacji).setOngoing(true).setPriority(Notification.PRIORITY_MAX).setVisibility(Notification.VISIBILITY_PUBLIC);
+        notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notyfikacja = builder.build();
+        notificationmanager.notify(0, notyfikacja);
+        odbiorznotyfikacji = new OdbiorZNotyfikacji();
+        IntentFilter[] filtry = new IntentFilter[ikony.length];
+        for(int i = 0; i < ikony.length; i++) {
+            filtry[i] = new IntentFilter(opisy[i]);
+            registerReceiver(odbiorznotyfikacji, filtry[i]);
+        }
+    }
+
+    public void notyfikacjaUstawStanGPS(final String string) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjastangps, string);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void notyfikacjaUstawSatelity(final String string) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjailoscsatelit, string);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void notyfikacjaUstawSzczegoly(final String string) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjaszczegolytrasy, string);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void notyfikacjaUstawCzas(final String string) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjaczas, string);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void notyfikacjaUstawIkoneGPS(final int zasob) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    widokmalejnotyfikacji.setImageViewResource(R.id.notyfikacjaikonasatelity, zasob);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void notyfikacjaZatwierdz() {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    notificationmanager.notify(0, notyfikacja);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     public boolean zapiszPunktPozycjaKursora(String nazwa, String komentarz) {
         if(tmiparser != null) {
             float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x));
@@ -434,7 +569,18 @@ public class AppService extends Service {
     }
 
     public boolean zapiszPunktPozycjaGPS(String nazwa, String komentarz) {
-        return false;
+        Location location = czyJestFix();
+        if(location != null) {
+            Boolean czyzapis = GPXPunktLogger.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()), nazwa, komentarz);
+            rysujwatek.odswiez = true;
+            if(czyzapis == true) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     public void wczytajKolejnaMape() {
@@ -590,6 +736,14 @@ public class AppService extends Service {
         }
     }
 
+    //Konczymy watek notyfikacji
+    private void zakonczNotyfikacjaWatek() {
+        if(notyfikacjawatek != null) {
+            notyfikacjawatek.zakoncz = true;
+            zakonczWatek(notyfikacjawatek);
+        }
+    }
+
     private void zakonczWatekGPS() {
         if(gpswatek != null) {
             gpswatek.quit();
@@ -609,18 +763,24 @@ public class AppService extends Service {
         zakonczWatekKompas();
         zakonczWatekWczytaj();
         zakonczWatekDzwieki();
+        zakonczNotyfikacjaWatek();
         zakonczWatekGPS();
     }
 
     public void zakonczUsluge() {
-        GPXPunktLogger.zakonczPlik();
-        if(obecnatrasa != null) {
-            obecnatrasa.zakonczPlik();
+        try {
+            GPXPunktLogger.zakonczPlik();
+            if (obecnatrasa != null) {
+                obecnatrasa.zakonczPlik();
+                obecnatrasa = null;
+            }
+            wystartowany = false;
+            widok = Stale.WIDOKBRAK;
+            wyrejestrujGPS();
+            zakonczWatki();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        wystartowany = false;
-        widok = Stale.WIDOKBRAK;
-        wyrejestrujGPS();
-        zakonczWatki();
         Toast.makeText(getApplicationContext(), Komunikaty.KONIECPROGRAMU, Toast.LENGTH_SHORT).show();
     }
 

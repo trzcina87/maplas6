@@ -6,20 +6,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -93,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView poziominfoimageview;
     private ImageView projektujimageview;
     private ImageView satelitaimageview;
+    private ImageView szybkipunktimageview;
     public MainSurface surface;
 
     //PokazPliki
@@ -198,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         satelitytextview = (TextView)maplayout.findViewById(R.id.statussatelity);
         satelitaimageview = (ImageView)maplayout.findViewById(R.id.imageviewsatelita);
         wyczysccache = (Button)opcjezaawansowanelayout.findViewById(R.id.wyczysccache);
+        szybkipunktimageview = (ImageView)maplayout.findViewById(R.id.szybkipunkt);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -580,8 +578,18 @@ public class MainActivity extends AppCompatActivity {
                 wyczyscCache();
             }
         });
+        szybkipunktimageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean zapis = AppService.service.zapiszPunktPozycjaGPS("Punkt", "");
+                if(zapis) {
+                    pokazToast("Zapisano: " + "Punkt");
+                } else {
+                    pokazToast("Blad zapisu! Sprawdz GPS!");
+                }
+            }
+        });
     }
-
 
     private void zmienStylJednegoTextView(TextView tv) {
         int styl = AppService.service.kolorinfo;
@@ -679,7 +687,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ustawSateliteCzerwona() {
-        ustawImageView(satelitaimageview, R.mipmap.sateligaczerwony);
+        ustawImageView(satelitaimageview, R.mipmap.satelitaczerwony);
     }
 
     //Konfigruje Menu glowne programu

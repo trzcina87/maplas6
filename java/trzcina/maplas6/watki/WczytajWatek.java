@@ -212,8 +212,8 @@ public class WczytajWatek extends Thread {
         Point centralnykafel = new Point(wyznaczIndexBitmapyX(AppService.service.pixelnamapienadsrodkiem.x), wyznaczIndexBitmapyY(AppService.service.pixelnamapienadsrodkiem.y));
         if((czyKafleRozne(centralnykafel, ostatnicentralnykafel)) || (odswiez == true)) {
             odswiez = false;
-            Point promien = new Point(Math.round(AppService.service.srodekekranu.x / (float) tmiparser.rozmiarkafla.x * 2) + 1, Math.round(AppService.service.srodekekranu.y / (float) tmiparser.rozmiarkafla.y * 2) + 1);
-            ilosckafli = (promien.x * 2 + 1) * (promien.y * 2 + 1);
+            Point promien = new Point(Math.round(AppService.service.srodekekranu.x / (float) tmiparser.rozmiarkafla.x * 2), Math.round(AppService.service.srodekekranu.y / (float) tmiparser.rozmiarkafla.y * 2));
+            ilosckafli = (promien.x * 2) * (promien.y * 2);
             int wiekszypromien = Math.max(promien.x, promien.y);
             int mniejszypromienbok = 0;
             int mniejszypromiengora = 0;
