@@ -186,28 +186,26 @@ public class RysujWatek extends Thread {
     }
 
     private void rysujTraseObecna(Canvas canvas, Point pixelnadsrodkiem) {
-        if(AppService.service.poziominfo >= Stale.OPISYPUNKTY) {
-            float promienpunktu = 4 * Painty.density;
-            GPXTrasaLogger obecnatrasa = AppService.service.obecnatrasa;
-            if(obecnatrasa != null) {
-                int dlugosc = obecnatrasa.dlugosc;
-                int popy = 0;
-                int popx = 0;
-                PunktWTrasie poprzedni = null;
-                for (int j = 0; j < dlugosc; j++) {
-                    PunktWTrasie punkt = obecnatrasa.lista[j];
-                    int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
-                    int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
-                    if ((j == 0) || (j == dlugosc - 1)) {
-                        canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintfioletowyokragtrasa);
-                    }
-                    if (poprzedni != null) {
-                        canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintfioletowyokragtrasa);
-                    }
-                    popy = y;
-                    popx = x;
-                    poprzedni = punkt;
+        float promienpunktu = 4 * Painty.density;
+        GPXTrasaLogger obecnatrasa = AppService.service.obecnatrasa;
+        if(obecnatrasa != null) {
+            int dlugosc = obecnatrasa.dlugosc;
+            int popy = 0;
+            int popx = 0;
+            PunktWTrasie poprzedni = null;
+            for (int j = 0; j < dlugosc; j++) {
+                PunktWTrasie punkt = obecnatrasa.lista[j];
+                int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
+                int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
+                if ((j == 0) || (j == dlugosc - 1)) {
+                    canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintfioletowyokragtrasa);
                 }
+                if (poprzedni != null) {
+                    canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintfioletowyokragtrasa);
+                }
+                popy = y;
+                popx = x;
+                poprzedni = punkt;
             }
         }
     }
@@ -245,9 +243,7 @@ public class RysujWatek extends Thread {
     private void rysujPunktyObecne(Canvas canvas, Point pixelnadsrodkiem) {
         float promienpunktu = 4 * Painty.density;
         for(int i = 0; i < GPXPunktLogger.lista.size(); i++) {
-            if(AppService.service.poziominfo >= Stale.OPISYPUNKTY) {
-                rysujPunktNaMapie(GPXPunktLogger.lista.get(i), canvas, Painty.paintfioletowyokrag, pixelnadsrodkiem, promienpunktu);
-            }
+            rysujPunktNaMapie(GPXPunktLogger.lista.get(i), canvas, Painty.paintfioletowyokrag, pixelnadsrodkiem, promienpunktu);
         }
     }
 

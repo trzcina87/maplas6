@@ -433,9 +433,9 @@ public class TmiParser {
         Location lok1 = new Location("dummyprovider");
         Location lok2 = new Location("dummyprovider");
         lok1.setLongitude(gpsstart.x);
-        lok1.setLatitude(gpsstart.y);
+        lok1.setLatitude(gpsstart.y + ((gpskoniec.y - gpsstart.y) / 2));
         lok2.setLongitude(gpskoniec.x);
-        lok2.setLatitude(gpskoniec.y);
+        lok2.setLatitude(gpsstart.y + ((gpskoniec.y - gpsstart.y) / 2));
         return lok1.distanceTo(lok2);
     }
 
