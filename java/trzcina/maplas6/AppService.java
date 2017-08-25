@@ -4,6 +4,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
@@ -13,12 +15,26 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Random;
 
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.Atlasy;
@@ -83,6 +99,10 @@ public class AppService extends Service {
     public Notification notyfikacja;
     public OdbiorZNotyfikacji odbiorznotyfikacji;
 
+    public long[] plikmerkatora;
+
+    public volatile int zoom;
+
     //Zerowanie watkow
     private void watkiNaNull() {
         luxwatek = null;
@@ -119,6 +139,8 @@ public class AppService extends Service {
         notificationmanager = null;
         notyfikacja = null;
         odbiorznotyfikacji = null;
+        plikmerkatora = null;
+        zoom = 10;
     }
 
     @Nullable
@@ -256,13 +278,19 @@ public class AppService extends Service {
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje bitmapy...");
                 Bitmapy.inicjujBitmapy();
 
-                //Wczytujemy dostepne atlasy
+                //Merkator
+                //Wczytujemy bitmapy do pamieci
                 MainActivity.activity.ustawProgressPrzygotowanie(4);
+                MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje plik Merkatora...");
+                wczytajPlikMerkatora();
+
+                //Wczytujemy dostepne atlasy
+                MainActivity.activity.ustawProgressPrzygotowanie(5);
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje atlasy...");
                 Atlasy.szukajAtlasow();
 
                 //Wczytujemy dostepne pliki
-                MainActivity.activity.ustawProgressPrzygotowanie(5);
+                MainActivity.activity.ustawProgressPrzygotowanie(6);
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje pliki...");
                 PlikiGPX.szukajPlikow();
 
@@ -276,6 +304,45 @@ public class AppService extends Service {
                 pokazPierwszyToast();
             }
         }).start();
+    }
+
+    public void przelaczNaMape(String nazwa, float wspx, float wspy) {
+        Ustawienia.atlas.wartosc = nazwa;
+        Ustawienia.atlas.zapiszWartoscDoUstawien();
+        MainActivity.activity.pokazToast(nazwa);
+        if (AppService.service.przelaczajpogps == true) {
+            zaczytajOpcje(true, wspx, wspy);
+        } else {
+            zaczytajOpcje(false, 0, 0);
+        }
+        odswiezUI();
+    }
+
+    public void zaproponujZmianeMapy(final Location location) {
+        final Atlas propozycja = Atlasy.szukajNajlepszejMapy(location);
+        if(propozycja != null) {
+            if(atlas == null) {
+                przelaczNaMape(propozycja.nazwa, (float)location.getLongitude(), (float)location.getLatitude());
+            } else {
+                if (atlas.czyWspolrzedneWewnatrz((float) location.getLongitude(), (float) location.getLatitude())) {
+                    if(propozycja.pobierzDokladnosc() < atlas.pobierzDokladnosc()) {
+                        MainActivity.activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new AlertDialog.Builder(MainActivity.activity).setIcon(android.R.drawable.ic_dialog_alert).setTitle(Komunikaty.ZMIANAMAPY).setMessage("Mapa " + propozycja.nazwa + Komunikaty.DOKLADNIEJSZAMAPA).setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        przelaczNaMape(propozycja.nazwa, (float)location.getLongitude(), (float)location.getLatitude());
+                                    }
+                                }).setNegativeButton("Nie", null).show();
+                            }
+                        });
+                    }
+                } else {
+                    przelaczNaMape(propozycja.nazwa, (float)location.getLongitude(), (float)location.getLatitude());
+                }
+            }
+        }
     }
 
     public void zmienPoziomInfo() {
@@ -321,6 +388,7 @@ public class AppService extends Service {
                     pixelnamapienadsrodkiem.set(tmiparser.obliczPixelXDlaWspolrzednej(gpsx), tmiparser.obliczPixelYDlaWspolrzednej(gpsy));
                 }
             }
+            zoom = 10;
             wczytajwatek.przeladujkonfiguracje = true;
             rysujwatek.przeladujkonfiguracje = true;
         }
@@ -348,10 +416,14 @@ public class AppService extends Service {
         if(wlaczgps == true) {
             if (gpslistener.ostatnialokalizacjazgps != null) {
                 if (gpslistener.ostatnialokalizacjazgps.getTime() + 10000 >= System.currentTimeMillis()) {
-                    if(precyzyjnygps == true) {
-                        return new Location(gpslistener.ostatnialokalizacjazgps);
+                    if(gpslistener.ostatnialokalizacjazgps.getTime() >= obecnatrasa.czasstart) {
+                        if (precyzyjnygps == true) {
+                            return new Location(gpslistener.ostatnialokalizacjazgps);
+                        } else {
+                            return new Location(gpslistener.ostatnialokalizacja);
+                        }
                     } else {
-                        return new Location(gpslistener.ostatnialokalizacja);
+                        return null;
                     }
                 }
             }
@@ -370,7 +442,11 @@ public class AppService extends Service {
         if(wlaczgps == true) {
             if (gpslistener.ostatnialokalizacjazgps != null) {
                 if (gpslistener.ostatnialokalizacjazgps.getTime() + 10000 >= System.currentTimeMillis()) {
-                    return true;
+                    if(gpslistener.ostatnialokalizacjazgps.getTime() >= obecnatrasa.czasstart) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             }
             if (gpslistener.ostatnialokalizacja != null) {
@@ -418,10 +494,19 @@ public class AppService extends Service {
         }
     }
 
+    public void odswiezUIZoom() {
+        if(zoom == 10) {
+            MainActivity.activity.ustawStatusZoom("");
+        } else {
+            MainActivity.activity.ustawStatusZoom(String.valueOf(zoom / (float)10 + "x "));
+        }
+    }
+
     public void odswiezUI() {
         odswiezUIGPS();
         odswiezUISatelity();
         odswiezUIIkonaSatelity();
+        odswiezUIZoom();
     }
 
     public void zmienKolorInfo() {
@@ -596,8 +681,14 @@ public class AppService extends Service {
             float gpsx = 0;
             float gpsy = 0;
             if(AppService.service.przelaczajpogps == true) {
-                gpsx = tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x);
-                gpsy = tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y);
+                Location lokalizacja = czyJestFix();
+                if(lokalizacja == null) {
+                    gpsx = tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x);
+                    gpsy = tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y);
+                } else {
+                    gpsx = (float)lokalizacja.getLongitude();
+                    gpsy = (float)lokalizacja.getLatitude();
+                }
                 int proby = 0;
                 int limit = Atlasy.atlasy.size() + 3;
                 while((proby < limit) && (Atlasy.atlasy.get(kolejny).czyWspolrzedneWewnatrz(gpsx, gpsy) == false)) {
@@ -615,36 +706,103 @@ public class AppService extends Service {
             Ustawienia.atlas.wartosc = nazwa;
             Ustawienia.atlas.zapiszWartoscDoUstawien();
             MainActivity.activity.pokazToast(nazwa);
-            odswiezUI();
             if(AppService.service.przelaczajpogps == true) {
                 zaczytajOpcje(true, gpsx, gpsy);
             } else {
                 zaczytajOpcje(false, 0, 0);
             }
+            odswiezUI();
         } else {
             MainActivity.activity.pokazToast(Komunikaty.BRAKATLASOW);
             zaczytajOpcje(false, 0, 0);
         }
     }
 
+
     public void pomniejszMape() {
         if(atlas == null) {
             MainActivity.activity.pokazToast(Komunikaty.BRAKATLASOW);
         } else {
-            int index = atlas.parserytmi.indexOf(tmiparser);
-            if(index == 0) {
-                MainActivity.activity.pokazToast(Komunikaty.BLADODDALANIA);
-            } else {
-                float gpsx = tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x);
-                float gpsy = tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y);
-                tmiparser = atlas.parserytmi.get(index - 1);
-                pixelnamapienadsrodkiem.set(tmiparser.obliczPixelXDlaWspolrzednej(gpsx), tmiparser.obliczPixelYDlaWspolrzednej(gpsy));
-                poprawPixelNadSrodkiem();
-                odswiezUI();
-                wczytajwatek.przeladujkonfiguracje = true;
-                rysujwatek.przeladujkonfiguracje = true;
+            if(zoom > 10) {
+                zoom = zoom - 5;
                 rysujwatek.odswiez = true;
+            } else {
+                int index = atlas.parserytmi.indexOf(tmiparser);
+                if (index == 0) {
+                    MainActivity.activity.pokazToast(Komunikaty.BLADODDALANIA);
+                } else {
+                    float gpsx = tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x);
+                    float gpsy = tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y);
+                    tmiparser = atlas.parserytmi.get(index - 1);
+                    pixelnamapienadsrodkiem.set(tmiparser.obliczPixelXDlaWspolrzednej(gpsx), tmiparser.obliczPixelYDlaWspolrzednej(gpsy));
+                    poprawPixelNadSrodkiem();
+                    wczytajwatek.przeladujkonfiguracje = true;
+                    rysujwatek.przeladujkonfiguracje = true;
+                    rysujwatek.odswiez = true;
+                }
             }
+        }
+        odswiezUI();
+    }
+
+    private boolean sprawdzCacheMerkatora() {
+        if(Arrays.asList(MainActivity.activity.fileList()).contains(Stale.SUFFIXCACHEMERKATOR)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void zapiszPlikMerkatoraDoCache(long[] plikmerkatora) {
+        ByteBuffer bajtytablicy = ByteBuffer.allocate(8 * plikmerkatora.length);
+        LongBuffer longbajtytablicy = bajtytablicy.asLongBuffer();
+        longbajtytablicy.put(plikmerkatora);
+        try {
+            FileOutputStream plikcachetab = MainActivity.activity.openFileOutput(Stale.SUFFIXCACHEMERKATOR, Context.MODE_PRIVATE);
+            plikcachetab.write(bajtytablicy.array(), 0, 8 * plikmerkatora.length);
+            plikcachetab.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void parsujPlikMerkatora() {
+        plikmerkatora = new long[900002];
+        InputStream raw = getResources().openRawResource(R.raw.merkator5);
+        BufferedReader r = new BufferedReader(new InputStreamReader(raw));
+        String line;
+        int i = 0;
+        try {
+            while ((line = r.readLine()) != null) {
+                String[] lines = line.split(",");
+                plikmerkatora[i] = Long.valueOf(lines[1]);
+                i++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        zapiszPlikMerkatoraDoCache(plikmerkatora);
+    }
+
+    private void wczytajCacheMerkatora() {
+        plikmerkatora = new long[900002];
+        try {
+            FileInputStream plikcachetab = MainActivity.activity.openFileInput(Stale.SUFFIXCACHEMERKATOR);
+            ByteBuffer bajtytablicy = ByteBuffer.allocate(8 * plikmerkatora.length);
+            Rozne.odczytajZPliku(plikcachetab, 8 * plikmerkatora.length, bajtytablicy.array());
+            plikcachetab.close();
+            LongBuffer longbajtytablicy = bajtytablicy.asLongBuffer();
+            longbajtytablicy.get(plikmerkatora, 0, plikmerkatora.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void wczytajPlikMerkatora() {
+        if(sprawdzCacheMerkatora() == false) {
+            parsujPlikMerkatora();
+        } else {
+            wczytajCacheMerkatora();
         }
     }
 
@@ -654,19 +812,24 @@ public class AppService extends Service {
         } else {
             int index = atlas.parserytmi.indexOf(tmiparser);
             if(index == atlas.parserytmi.size() - 1) {
-                MainActivity.activity.pokazToast(Komunikaty.BLADPRZYBLIZANIA);
+                if(zoom < 80) {
+                    zoom = zoom + 5;
+                    rysujwatek.odswiez = true;
+                } else {
+                    MainActivity.activity.pokazToast(Komunikaty.BLADPRZYBLIZANIA);
+                }
             } else {
                 float gpsx = tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x);
                 float gpsy = tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y);
                 tmiparser = atlas.parserytmi.get(index + 1);
                 pixelnamapienadsrodkiem.set(tmiparser.obliczPixelXDlaWspolrzednej(gpsx), tmiparser.obliczPixelYDlaWspolrzednej(gpsy));
                 poprawPixelNadSrodkiem();
-                odswiezUI();
                 wczytajwatek.przeladujkonfiguracje = true;
                 rysujwatek.przeladujkonfiguracje = true;
                 rysujwatek.odswiez = true;
             }
         }
+        odswiezUI();
     }
 
     //Serwis startuje (po starcie MainActivity)

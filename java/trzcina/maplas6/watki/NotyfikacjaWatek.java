@@ -28,6 +28,7 @@ public class NotyfikacjaWatek extends Thread {
             AppService.service.notyfikacjaUstawSzczegoly("");
             AppService.service.notyfikacjaUstawSatelity("");
             AppService.service.notyfikacjaUstawStanGPS("");
+            AppService.service.notyfikacjaUstawIkoneGPS(R.mipmap.satelitaczerwony);
             if (AppService.service.wlaczgps) {
                 Location lokalizacja = AppService.service.czyJestFix();
                 if (lokalizacja != null) {

@@ -65,6 +65,19 @@ public class Rozne {
         return bajty.getInt();
     }
 
+    public static byte[] odczytajZPliku(InputStream plik, int ilosc) throws IOException {
+        byte[] bajty = new byte[ilosc];
+        int przeczytano = 0;
+        while(przeczytano < ilosc) {
+            int przeczytanowprzebiegu = plik.read(bajty, przeczytano, ilosc - przeczytano);
+            if(przeczytanowprzebiegu == -1) {
+                break;
+            }
+            przeczytano = przeczytano + przeczytanowprzebiegu;
+        }
+        return bajty;
+    }
+
     public static byte[] odczytajZPliku(FileInputStream plik, int ilosc) throws IOException {
         byte[] bajty = new byte[ilosc];
         int przeczytano = 0;
@@ -136,5 +149,17 @@ public class Rozne {
         double val = liczba * 100000;
         long vall = Math.round(val);
         return vall / 100000F;
+    }
+
+    public static long pomnoz4(double liczba) {
+        double val = liczba*10000;
+        long vall = Math.round(val);
+        return vall;
+    }
+
+    public static long pomnoz5(double liczba) {
+        double val = liczba*100000;
+        long vall = Math.round(val);
+        return vall;
     }
 }

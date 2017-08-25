@@ -13,4 +13,6 @@ public class Komunikaty {
     public static final String BLADODDALANIA = "Nie można oddalic";
     public static final String BLADPRZYBLIZANIA = "Nie można przybliżyc";
     public static final String USUNAC = "Usunąć?";
+    public static final String ZMIANAMAPY = "Dokladniejsza mapa?";
+    public static final String DOKLADNIEJSZAMAPA = " jest dokladniejsza od obecnej. Wczytac?";
 }

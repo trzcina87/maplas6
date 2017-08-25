@@ -67,6 +67,7 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
     //Dotkniecie palcem na surface
     @Override
     public boolean onTouch(View view, MotionEvent event) {
+        float zoom = AppService.service.zoom / (float)10;
         int x = (int)(event.getX());
         int y = (int)(event.getY());
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
@@ -74,7 +75,7 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
                 startprzesuwania.set(x, y);
                 break;
             case MotionEvent.ACTION_UP:
-                AppService.service.pixelnamapienadsrodkiem.offset(startprzesuwania.x - x, startprzesuwania.y - y);
+                AppService.service.pixelnamapienadsrodkiem.offset(Math.round((startprzesuwania.x - x) / zoom), Math.round((startprzesuwania.y - y) / zoom));
                 AppService.service.poprawPixelNadSrodkiem();
                 AppService.service.odswiezUI();
                 AppService.service.rysujwatek.odswiez = true;
@@ -88,7 +89,7 @@ public class MainSurface extends SurfaceView implements View.OnTouchListener {
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                AppService.service.pixelnamapienadsrodkiem.offset(startprzesuwania.x - x, startprzesuwania.y - y);
+                AppService.service.pixelnamapienadsrodkiem.offset(Math.round((startprzesuwania.x - x) / zoom), Math.round((startprzesuwania.y - y) / zoom));
                 AppService.service.poprawPixelNadSrodkiem();
                 AppService.service.odswiezUI();
                 AppService.service.rysujwatek.odswiez = true;

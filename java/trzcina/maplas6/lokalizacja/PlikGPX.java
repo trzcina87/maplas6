@@ -5,9 +5,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +28,8 @@ public class PlikGPX {
     public List<PunktNaMapie> punkty;
     public List<PunktWTrasie> trasa;
     public Boolean zaznaczony;
+    public long rozmiar;
+    public float dlugosctrasy;
 
     public PlikGPX(String sciezka) {
         this.sciezka = sciezka;
@@ -32,6 +38,60 @@ public class PlikGPX {
         punkty = new ArrayList<>(100);
         trasa = new ArrayList<>(100);
         zaznaczony = false;
+        rozmiar = 0;
+        dlugosctrasy = 0;
+        try {
+            rozmiar = new File(sciezka).length();
+            rozmiar = Math.round(rozmiar / (double)1024);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void naprawJesliTrzeba() {
+        try {
+            BufferedReader input = new BufferedReader(new FileReader(sciezka));
+            String ostatnialinia = "</gpx>";
+            String czytanalinia;
+            boolean plikpunktowbool = false;
+            boolean pliktrasbool = false;
+            while ((czytanalinia = input.readLine()) != null) {
+                if(czytanalinia.trim().startsWith("<wpt ")) {
+                    plikpunktowbool = true;
+                }
+                if(czytanalinia.trim().startsWith("<trk>")) {
+                    pliktrasbool = true;
+                }
+                if(czytanalinia.trim().length() > 0) {
+                    ostatnialinia = czytanalinia;
+                }
+            }
+            input.close();
+            if(ostatnialinia.trim().replace(" ", "").endsWith("</gpx>") == false) {
+                if(!((pliktrasbool) && (plikpunktowbool))) {
+                    if(pliktrasbool) {
+                        FileWriter filewriter = new FileWriter(new File(sciezka), true);
+                        PrintWriter printwriter = new PrintWriter(filewriter);
+                        printwriter.println("");
+                        printwriter.println("    </trkseg>");
+                        printwriter.println("  </trk>");
+                        printwriter.println("</gpx>");
+                        printwriter.flush();
+                        printwriter.close();
+                    }
+                    if(plikpunktowbool) {
+                        FileWriter filewriter = new FileWriter(new File(sciezka), true);
+                        PrintWriter printwriter = new PrintWriter(filewriter);
+                        printwriter.println("");
+                        printwriter.println("</gpx>");
+                        printwriter.flush();
+                        printwriter.close();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String pobierzWartoscParametru(String tag, Element element) {
@@ -71,12 +131,17 @@ public class PlikGPX {
 
     private void szukajTRK(Document dokument) {
         NodeList lista = dokument.getElementsByTagName("trkpt");
+        PunktWTrasie poprzedni = null;
         for(int i = 0; i < lista.getLength(); i++) {
             Node node = lista.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
                 PunktWTrasie punktwtrasie = new PunktWTrasie(Float.parseFloat(element.getAttribute("lon")), Float.parseFloat(element.getAttribute("lat")));
                 trasa.add(punktwtrasie);
+                if(poprzedni != null) {
+                    dlugosctrasy = dlugosctrasy + PunktWTrasie.zmierzDystans(poprzedni, punktwtrasie);
+                }
+                poprzedni = punktwtrasie;
             }
         }
     }
@@ -87,9 +152,7 @@ public class PlikGPX {
             Document dokument = otworzPlik();
             szukajWPT(dokument);
             szukajTRK(dokument);
-            if((trasa.size() > 0) || (punkty.size() > 0)) {
-                stan = Stale.PLIKGOTOWY;
-            }
+            stan = Stale.PLIKGOTOWY;
         } catch (Exception e) {
             e.printStackTrace();
             stan = Stale.PLIKBLAD;

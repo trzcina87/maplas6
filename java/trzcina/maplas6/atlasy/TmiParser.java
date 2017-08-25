@@ -15,14 +15,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import trzcina.maplas6.AppService;
 import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.pomoc.MD5;
 import trzcina.maplas6.pomoc.Rozne;
@@ -48,6 +47,11 @@ public class TmiParser {
     public Float rozpietoscxgeograficzna;
     public Float rozpietoscygeograficzna;
     public float rozpietoscxwmetrach;
+    public long poczatekmerkatora;
+    public long rozpietoscmerkatora;
+    public boolean merkator;
+    public float[] szerokoscidlapixeli;
+    public double dokladnosc;
 
     public TmiParser(String sciezka) {
         this.sciezka = sciezka;
@@ -65,6 +69,9 @@ public class TmiParser {
         rozmiarmapy = new Point(-1, -1);
         rozmiarkafla = new Point(-1, -1);
         ilosckafli = new Point(-1, -1);
+        merkator = false;
+        szerokoscidlapixeli = null;
+        dokladnosc = 0;
     }
 
     //Na podstawie wpisu z TMI ustawiamy rozszerzenie pliku graficznego
@@ -237,7 +244,7 @@ public class TmiParser {
 
     //Sprawdzamy czy istnieja pliki Cache
     private boolean sprawdzCache() {
-        if((Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHEDANE)) && (Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHETAB))) {
+        if((Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHEDANE)) && (Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHETAB)) && (Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHESZER))) {
             return true;
         } else {
             return false;
@@ -285,6 +292,17 @@ public class TmiParser {
         }
     }
 
+    //Wczytuje szerokosci z trzeciego pliku cache
+    private void wczytajTrzeciPlik() throws IOException {
+        FileInputStream plikcachetab = MainActivity.activity.openFileInput(md5sciezka + Stale.SUFFIXCACHESZER);
+        ByteBuffer bajtytablicy = ByteBuffer.allocate(Float.SIZE / 8 * (rozmiarmapy.y + 3));
+        Rozne.odczytajZPliku(plikcachetab, Float.SIZE / 8 * (rozmiarmapy.y + 3), bajtytablicy.array());
+        plikcachetab.close();
+        FloatBuffer floatbajtytablicy = bajtytablicy.asFloatBuffer();
+        szerokoscidlapixeli = new float[rozmiarmapy.y + 3];
+        floatbajtytablicy.get(szerokoscidlapixeli, 0, szerokoscidlapixeli.length);
+    }
+
     //Wczytuje i zwraca pojedynczy int z cache
     private int wczytajIntZCache(FileInputStream plik) throws IOException {
         byte[] bajty = Rozne.odczytajZPliku(plik, 4);
@@ -301,6 +319,10 @@ public class TmiParser {
     private void wczytajCache() throws IOException {
         wczytajPierwszyPlik();
         wczytajDrugiPlik();
+        uzupelnijPolaPomocnicze();
+        if(merkator == true) {
+            wczytajTrzeciPlik();
+        }
     }
 
     //Tworzy dodatkowe sciezki na podstawie istnirjacej
@@ -388,10 +410,23 @@ public class TmiParser {
         plikcachetab.close();
     }
 
+    //Zapis szerokosci
+    private void zapiszTrzeciPlik() throws IOException {
+        ByteBuffer bajtytablicy = ByteBuffer.allocate(Float.SIZE / 8 * szerokoscidlapixeli.length);
+        FloatBuffer floatbajtytablicy = bajtytablicy.asFloatBuffer();
+        floatbajtytablicy.put(szerokoscidlapixeli);
+        FileOutputStream plikcachetab = MainActivity.activity.openFileOutput(md5sciezka + Stale.SUFFIXCACHESZER, Context.MODE_PRIVATE);
+        plikcachetab.write(bajtytablicy.array(), 0, Float.SIZE / 8 * szerokoscidlapixeli.length);
+        plikcachetab.close();
+    }
+
     //Zapisuje dane i tablice do plikow cache
     private void zapiszCache() throws IOException {
         zapiszPierwszyPlik();
         zapiszDrugiPlik();
+        if(merkator == true) {
+            zapiszTrzeciPlik();
+        }
     }
 
     private float obliczRozpietoscWMetrach() {
@@ -404,10 +439,84 @@ public class TmiParser {
         return lok1.distanceTo(lok2);
     }
 
+    private float znajdzPierwszaSzerokosc() {
+        for(int i = 0; i < szerokoscidlapixeli.length; i++) {
+            if(szerokoscidlapixeli[i] != 0) {
+                return szerokoscidlapixeli[i];
+            }
+        }
+        return 0;
+    }
+
+    private void stworzTabliceSzerokosciDlaPixeli() {
+        szerokoscidlapixeli = new float[rozmiarmapy.y + 3];
+        for(int i = 0; i <= rozmiarmapy.y; i++) {
+            szerokoscidlapixeli[i] = 0;
+        }
+    }
+
+    private void wyliczPikseleDlaWspolrzednych(int[] pikseledlawspolrzednych, float zaokraglonystarty) {
+        for(int i = 0; i < pikseledlawspolrzednych.length; i++) {
+            pikseledlawspolrzednych[i] = obliczPixelYDlaWspolrzednej(zaokraglonystarty + i * 0.00001F);
+        }
+    }
+
+    private void wyliczSzerokosciDlaPikseli(int pikseledlawspolrzednych[], float zaokraglonystarty) {
+        int ostatni = pikseledlawspolrzednych[0];
+        double suma = zaokraglonystarty;
+        int ilosc = 1;
+        for(int i = 1; i < pikseledlawspolrzednych.length; i++) {
+            if(pikseledlawspolrzednych[i] != ostatni) {
+                if((ostatni >= 0) && (ostatni < szerokoscidlapixeli.length)) {
+                    szerokoscidlapixeli[ostatni] = Rozne.zaokraglij5((float) (suma / (double) ilosc));
+                }
+                suma = zaokraglonystarty + i * 0.00001F;
+                ilosc = 1;
+            } else {
+                suma = suma + zaokraglonystarty + i * 0.00001F;
+                ilosc = ilosc + 1;
+            }
+            ostatni = pikseledlawspolrzednych[i];
+        }
+    }
+
+    private void uzupelnijBrakujaceSzerokosciDlaPikseli() {
+        float ostatnia = znajdzPierwszaSzerokosc();
+        for(int i = 0; i < szerokoscidlapixeli.length; i++) {
+            if(szerokoscidlapixeli[i] == 0) {
+                szerokoscidlapixeli[i] = ostatnia;
+            } else {
+                ostatnia = szerokoscidlapixeli[i];
+            }
+        }
+    }
+
+    private void obliczSzerokosciDlaPikseli() {
+        float zaokraglonystarty = Rozne.zaokraglij5(gpsstart.y) - 0.001F;
+        float zaokraglonykoniecy = Rozne.zaokraglij5(gpskoniec.y) + 0.001F;
+        int iloscmalychstopninamapie = (int) (Rozne.zaokraglij5(zaokraglonykoniecy - zaokraglonystarty) * 100000);
+        int[] pikseledlawspolrzednych = new int[iloscmalychstopninamapie + 1];
+        stworzTabliceSzerokosciDlaPixeli();
+        wyliczPikseleDlaWspolrzednych(pikseledlawspolrzednych, zaokraglonystarty);
+        wyliczSzerokosciDlaPikseli(pikseledlawspolrzednych, zaokraglonystarty);
+        uzupelnijBrakujaceSzerokosciDlaPikseli();
+    }
+
     private void uzupelnijPolaPomocnicze() {
         rozpietoscxgeograficzna = gpskoniec.x - gpsstart.x;
         rozpietoscygeograficzna = gpskoniec.y - gpsstart.y;
         rozpietoscxwmetrach = obliczRozpietoscWMetrach();
+        if((gpsstart.y >= 48.01F) && (gpskoniec.y <= 56.99F)) {
+            merkator = true;
+            long merpocz = Rozne.pomnoz5(gpsstart.y) - 4800000;
+            long merkon = Rozne.pomnoz5(gpskoniec.y) - 4800000;
+            poczatekmerkatora = AppService.service.plikmerkatora[(int) merpocz];
+            long koniecmerkatora = AppService.service.plikmerkatora[(int) merkon];
+            rozpietoscmerkatora = koniecmerkatora - poczatekmerkatora;
+        } else {
+            merkator = false;
+        }
+        dokladnosc = rozpietoscxwmetrach / (float)rozmiarmapy.x;
     }
 
     //Parsujemy plik TMI
@@ -426,9 +535,12 @@ public class TmiParser {
             utworzTablice();
             drugiPrzebieg();
             parsujMap();
+            uzupelnijPolaPomocnicze();
+            if(merkator == true) {
+                obliczSzerokosciDlaPikseli();
+            }
             zapiszCache();
         }
-        uzupelnijPolaPomocnicze();
     }
 
     public boolean weryfikuj() {
@@ -462,8 +574,17 @@ public class TmiParser {
     }
 
     public float obliczWspolrzednaYDlaPixela(int pixel) {
-        float procentmapy = pixel / (float)rozmiarmapy.y;
-        return gpskoniec.y - procentmapy * rozpietoscygeograficzna;
+        if (merkator == false) {
+            float procentmapy = pixel / (float) rozmiarmapy.y;
+            return gpskoniec.y - procentmapy * rozpietoscygeograficzna;
+        } else {
+            if((pixel >= 0) && (pixel < szerokoscidlapixeli.length)) {
+                return szerokoscidlapixeli[pixel];
+            } else {
+                float procentmapy = pixel / (float) rozmiarmapy.y;
+                return gpskoniec.y - procentmapy * rozpietoscygeograficzna;
+            }
+        }
     }
 
     public int obliczPixelXDlaWspolrzednej(float wspolrzedna) {
@@ -472,8 +593,14 @@ public class TmiParser {
     }
 
     public int obliczPixelYDlaWspolrzednej(float wspolrzedna) {
-        float procentwspolrzednej = (wspolrzedna - gpsstart.y) / rozpietoscygeograficzna;
-        return Math.round(rozmiarmapy.y - procentwspolrzednej * rozmiarmapy.y);
+        if(merkator == false) {
+            float procentwspolrzednej = (wspolrzedna - gpsstart.y) / rozpietoscygeograficzna;
+            return Math.round(rozmiarmapy.y - procentwspolrzednej * rozmiarmapy.y);
+        } else {
+            long wartoscmerkatoradlawspolrzednej = Rozne.pomnoz5(wspolrzedna) - 4800000;
+            double procent = (AppService.service.plikmerkatora[(int) wartoscmerkatoradlawspolrzednej] - poczatekmerkatora) / (double) rozpietoscmerkatora;
+            return (int) (rozmiarmapy.y - procent * rozmiarmapy.y);
+        }
     }
 
     public boolean czyWspolrzedneWewnatrz(float gpsx, float gpsy) {

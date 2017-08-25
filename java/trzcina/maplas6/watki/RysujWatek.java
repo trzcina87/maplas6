@@ -1,5 +1,6 @@
 package trzcina.maplas6.watki;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -36,6 +37,7 @@ public class RysujWatek extends Thread {
     public Atlas atlas;
     public TmiParser tmiparser;
     private float density;
+    public float zoom;
 
     String[] opisykol = {"20m", "50m", "100m", "200m", "500m", "1km", "2km", "5km", "10km", "20km", "50km", "100km", "200km"};
     int[] metrykol = {20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000};
@@ -50,12 +52,13 @@ public class RysujWatek extends Thread {
         density = activity.getResources().getDisplayMetrics().density;
         rysujkola = new boolean[13];
         promieniekol = new double[13];
+        zoom = 1;
     }
 
     private void przeliczKola() {
         for(int kolo = 0; kolo <= 12; kolo++) {
             promieniekol[kolo] = ((double)metrykol[kolo] / (double)tmiparser.rozpietoscxwmetrach) * (double)tmiparser.rozmiarmapy.x;
-            if((promieniekol[kolo] >= 25 * Painty.density) && (promieniekol[kolo] <= Math.max(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y) * 1.1)) {
+            if((promieniekol[kolo] >= 25 * zoom * Painty.density) && (promieniekol[kolo] <= Math.max(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y) * 1.1)) {
                 rysujkola[kolo] = true;
             } else {
                 rysujkola[kolo] = false;
@@ -105,13 +108,13 @@ public class RysujWatek extends Thread {
         canvas.drawCircle(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y, Stale.SZEROKOSCSRODKOWEGOKOLA * density, Painty.paintczerwonysrodek);
         for (int kolo = 0; kolo <= 12; kolo++) {
             if (rysujkola[kolo]) {
-                canvas.drawCircle(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y, (float) promieniekol[kolo], Painty.paintczerwoneokregi);
+                canvas.drawCircle(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y, (float) (promieniekol[kolo] * zoom), Painty.paintczerwoneokregi);
                 if(AppService.service.kolorinfo == 3) {
                     Rect zarys = new Rect();
                     Painty.painttekst[AppService.service.kolorinfo].getTextBounds(opisykol[kolo], 0, opisykol[kolo].length(), zarys);
-                    rysujProstokat(canvas, (float)AppService.service.srodekekranu.x - 20 - 3, (float) (AppService.service.srodekekranu.y + promieniekol[kolo] - 9) - zarys.height() - 4, zarys.width() + 11, zarys.height() + 10, Painty.paintczarnyprostokat);
+                    rysujProstokat(canvas, (float)AppService.service.srodekekranu.x - 20 - 3, (float) (AppService.service.srodekekranu.y + zoom * promieniekol[kolo] - 9) - zarys.height() - 4, zarys.width() + 11, zarys.height() + 10, Painty.paintczarnyprostokat);
                 }
-                canvas.drawText(opisykol[kolo], AppService.service.srodekekranu.x - 20, (float) (AppService.service.srodekekranu.y + promieniekol[kolo] - 9), Painty.painttekst[AppService.service.kolorinfo]);
+                canvas.drawText(opisykol[kolo], AppService.service.srodekekranu.x - 20, (float) (AppService.service.srodekekranu.y + zoom * promieniekol[kolo] - 9), Painty.painttekst[AppService.service.kolorinfo]);
             }
         }
     }
@@ -120,22 +123,35 @@ public class RysujWatek extends Thread {
         try {
             Point srodekekranu = AppService.service.srodekekranu;
             Point centralnykafel = new Point(AppService.service.wczytajwatek.wyznaczIndexBitmapyX(AppService.service.pixelnamapienadsrodkiem.x), AppService.service.wczytajwatek.wyznaczIndexBitmapyY(AppService.service.pixelnamapienadsrodkiem.y));
-            int odlegloscodlewejkrawedzikafla = AppService.service.pixelnamapienadsrodkiem.x - centralnykafel.x * tmiparser.rozmiarkafla.x;
-            int odlegloscodgornejkrawedzikafla = AppService.service.pixelnamapienadsrodkiem.y - centralnykafel.y * tmiparser.rozmiarkafla.y;
-            int startcentralnegokaflax = srodekekranu.x - odlegloscodlewejkrawedzikafla;
-            int startcentralnegokaflay = srodekekranu.y - odlegloscodgornejkrawedzikafla;
+            int odlegloscodlewejkrawedzikafla = (int) (AppService.service.pixelnamapienadsrodkiem.x - centralnykafel.x * tmiparser.rozmiarkafla.x);
+            int odlegloscodgornejkrawedzikafla = (int) (AppService.service.pixelnamapienadsrodkiem.y - centralnykafel.y * tmiparser.rozmiarkafla.y);
+            int startcentralnegokaflax = (int) (srodekekranu.x - odlegloscodlewejkrawedzikafla * zoom);
+            int startcentralnegokaflay = (int) (srodekekranu.y - odlegloscodgornejkrawedzikafla * zoom);
             int ilosckafliwlewo = startcentralnegokaflax / tmiparser.rozmiarkafla.x + 1;
             int ilosckafliwgore = startcentralnegokaflay / tmiparser.rozmiarkafla.y + 1;
-            for(int i = -ilosckafliwlewo; i <= ilosckafliwlewo + 1; i++) {
-                for(int j = -ilosckafliwgore; j <= ilosckafliwgore + 1; j++) {
+            if(ilosckafliwlewo <= 0) {
+                ilosckafliwlewo = 1;
+            }
+            if(ilosckafliwgore <= 0) {
+                ilosckafliwgore = 1;
+            }
+            int dodatkowykafel = 1;
+            for(int i = -ilosckafliwlewo; i <= ilosckafliwlewo + dodatkowykafel; i++) {
+                for(int j = -ilosckafliwgore; j <= ilosckafliwgore + dodatkowykafel; j++) {
                     if(AppService.service.wczytajwatek.czyBitmapaWczytana(centralnykafel.x + i, centralnykafel.y + j)) {
-                        canvas.drawBitmap(AppService.service.wczytajwatek.bitmapy[centralnykafel.x + i][centralnykafel.y + j], startcentralnegokaflax + i * tmiparser.rozmiarkafla.x, startcentralnegokaflay + j * tmiparser.rozmiarkafla.y, null);
+                        Bitmap kafel = AppService.service.wczytajwatek.bitmapy[centralnykafel.x + i][centralnykafel.y + j];
+                        int rozmiarxpozoom = (int) (zoom * kafel.getWidth());
+                        int rozmiarypozoom = (int) (zoom * kafel.getHeight());
+                        int lewo = (int)(startcentralnegokaflax + i * tmiparser.rozmiarkafla.x * zoom);
+                        int gora = (int)(startcentralnegokaflay + j * tmiparser.rozmiarkafla.y * zoom);
+                        canvas.drawBitmap(kafel, new Rect(0, 0, kafel.getWidth(), kafel.getHeight()), new Rect(lewo, gora, lewo + rozmiarxpozoom, gora + rozmiarypozoom), null);
                     } else {
                         odswiez = true;
                     }
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             zwolnijCanvas(canvas);
             odswiez = true;
         }
@@ -155,10 +171,10 @@ public class RysujWatek extends Thread {
                         int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
                         int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
                         if ((j == 0) || (j == lista.size() - 1)) {
-                            canvas.drawCircle(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, promienpunktu, Painty.paintzielonyokragtrasa);
+                            canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintzielonyokragtrasa);
                         }
                         if (poprzedni != null) {
-                            canvas.drawLine(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, AppService.service.srodekekranu.x + popx - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + popy - pixelnadsrodkiem.y, Painty.paintzielonyokragtrasa);
+                            canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintzielonyokragtrasa);
                         }
                         popy = y;
                         popx = x;
@@ -183,10 +199,10 @@ public class RysujWatek extends Thread {
                     int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
                     int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
                     if ((j == 0) || (j == dlugosc - 1)) {
-                        canvas.drawCircle(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, promienpunktu, Painty.paintfioletowyokragtrasa);
+                        canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintfioletowyokragtrasa);
                     }
                     if (poprzedni != null) {
-                        canvas.drawLine(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, AppService.service.srodekekranu.x + popx - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + popy - pixelnadsrodkiem.y, Painty.paintfioletowyokragtrasa);
+                        canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintfioletowyokragtrasa);
                     }
                     popy = y;
                     popx = x;
@@ -203,24 +219,24 @@ public class RysujWatek extends Thread {
     private void rysujPunktNaMapie(PunktNaMapie punkt, Canvas canvas, Paint paint, Point pixelnadsrodkiem, float promienpunktu) {
         int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
         int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
-        canvas.drawCircle(AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y, promienpunktu, paint);
+        canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, paint);
         if(AppService.service.poziominfo >= Stale.OPISYNAZWY) {
             if(punkt.nazwa != null) {
                 Rect zarys = new Rect();
                 Painty.painttekst[AppService.service.kolorinfo].getTextBounds(punkt.nazwa, 0, punkt.nazwa.length(), zarys);
                 if(AppService.service.kolorinfo == 3) {
-                    rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x  + x - pixelnadsrodkiem.x - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y - promienpunktu - 8 - zarys.height() - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                    rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x  + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8 - zarys.height() - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
                 }
-                canvas.drawText(punkt.nazwa, AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x - zarys.width() / 2, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y - promienpunktu - 8, Painty.painttekst[AppService.service.kolorinfo]);
+                canvas.drawText(punkt.nazwa, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8, Painty.painttekst[AppService.service.kolorinfo]);
             }
             if(AppService.service.poziominfo >= Stale.OPISYKOMENTARZE) {
                 if(punkt.opis != null) {
                     Rect zarys = new Rect();
                     Painty.painttekst[AppService.service.kolorinfo].getTextBounds(punkt.opis, 0, punkt.opis.length(), zarys);
                     if(AppService.service.kolorinfo == 3) {
-                        rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x  + x - pixelnadsrodkiem.x - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y + promienpunktu + 6 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                        rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x  + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
                     }
-                    canvas.drawText(punkt.opis, AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x - zarys.width() / 2, AppService.service.srodekekranu.y + y - pixelnadsrodkiem.y + promienpunktu + 6 - zarys.top, Painty.painttekst[AppService.service.kolorinfo]);
+                    canvas.drawText(punkt.opis, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - zarys.top, Painty.painttekst[AppService.service.kolorinfo]);
                 }
             }
         }
@@ -282,7 +298,7 @@ public class RysujWatek extends Thread {
         if(lokalizacja != null) {
             int x = tmiparser.obliczPixelXDlaWspolrzednej((float) lokalizacja.getLongitude());
             int y = tmiparser.obliczPixelYDlaWspolrzednej((float) lokalizacja.getLatitude());
-            canvas.drawBitmap(Bitmapy.kursorgps, AppService.service.srodekekranu.x + x - pixelnadsrodkiem.x - Bitmapy.kursorgps.getWidth() / 2, AppService.service.srodekekranu.y +y - pixelnadsrodkiem.y - Bitmapy.kursorgps.getHeight() / 2, null);
+            canvas.drawBitmap(Bitmapy.kursorgps, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - Bitmapy.kursorgps.getWidth() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - Bitmapy.kursorgps.getHeight() / 2, null);
         }
     }
 
@@ -331,6 +347,7 @@ public class RysujWatek extends Thread {
 
             //Gdy mamy cos odswiezyc
             if(odswiez == true) {
+                zoom = AppService.service.zoom / (float)10;
                 if (activity.surface.surfaceholder.getSurface().isValid()) {
                     odswiez = false;
                     odswiezEkran();

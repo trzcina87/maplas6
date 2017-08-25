@@ -1,5 +1,7 @@
 package trzcina.maplas6.atlasy;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +22,10 @@ public class Atlas {
         stan = Stale.ATLASNOWY;
         plikitmi = new ArrayList<>(20);
         parserytmi = new ArrayList<>(20);
+    }
+
+    public double pobierzDokladnosc() {
+        return parserytmi.get(parserytmi.size() - 1).dokladnosc;
     }
 
     //Szuka plikow TMI w podanym folderze i dodaje do listy

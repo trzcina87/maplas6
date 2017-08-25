@@ -103,12 +103,12 @@ public class PlikiGPX {
         pliki = new ArrayList<>(100);
         File[] plikiwkatalogu = szukajPlikowGPSWKatalogu();
         if(plikiwkatalogu != null) {
-
             sortujPliki(plikiwkatalogu);
 
             //Dla kazdego katalogu w katalogu z mapami tworzymy atlas
             for(int i = 0; i < plikiwkatalogu.length; i++) {
                 PlikGPX plikgpx = new PlikGPX(plikiwkatalogu[i].getAbsolutePath());
+                plikgpx.naprawJesliTrzeba();
                 plikgpx.parsuj();
                 if(plikgpx.stan == Stale.PLIKGOTOWY) {
                     pliki.add(plikgpx);

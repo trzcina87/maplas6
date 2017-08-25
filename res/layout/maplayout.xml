@@ -143,6 +143,17 @@
         android:text="" />
 
     <TextView
+        android:id="@+id/statuszoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/statussatelity"
+        android:textColor="@android:color/white"
+        android:paddingTop="24dp"
+        android:text="" />
+
+
+    <TextView
         android:id="@+id/statussatelity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

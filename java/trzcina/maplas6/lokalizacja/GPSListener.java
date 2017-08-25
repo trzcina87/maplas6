@@ -30,6 +30,9 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
         if(location != null) {
             GPXTrasaLogger obecnatrasa = AppService.service.obecnatrasa;
             if(obecnatrasa != null) {
+                if(obecnatrasa.dlugosc == 0) {
+                    AppService.service.zaproponujZmianeMapy(new Location(location));
+                }
                 obecnatrasa.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()));
                 ostatnialokalizacja = location;
                 AppService.service.dzwiekiwatek.czasostatniejlokalizacji = System.currentTimeMillis();

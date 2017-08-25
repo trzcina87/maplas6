@@ -1,5 +1,7 @@
 package trzcina.maplas6.atlasy;
 
+import android.location.Location;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,5 +68,19 @@ public class Atlasy {
             }
         }
         return null;
+    }
+
+    public static Atlas szukajNajlepszejMapy(Location location) {
+        Atlas propozcyja = null;
+        double dokladnosc = 1000000;
+        for(int i = 0; i < atlasy.size(); i++) {
+            if(atlasy.get(i).czyWspolrzedneWewnatrz((float)location.getLongitude(), (float)location.getLatitude())) {
+                if(atlasy.get(i).pobierzDokladnosc() < dokladnosc) {
+                    propozcyja = atlasy.get(i);
+                    dokladnosc = atlasy.get(i).pobierzDokladnosc();
+                }
+            }
+        }
+        return propozcyja;
     }
 }

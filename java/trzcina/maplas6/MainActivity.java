@@ -44,6 +44,7 @@ import trzcina.maplas6.pomoc.Komunikaty;
 import trzcina.maplas6.pomoc.ObslugaMenu;
 import trzcina.maplas6.pomoc.OpcjePagerAdapter;
 import trzcina.maplas6.pomoc.Painty;
+import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.pomoc.Uprawnienia;
 import trzcina.maplas6.ustawienia.Ustawienia;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView projektujimageview;
     private ImageView satelitaimageview;
     private ImageView szybkipunktimageview;
+    public TextView statuszoom;
     public MainSurface surface;
 
     //PokazPliki
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         satelitaimageview = (ImageView)maplayout.findViewById(R.id.imageviewsatelita);
         wyczysccache = (Button)opcjezaawansowanelayout.findViewById(R.id.wyczysccache);
         szybkipunktimageview = (ImageView)maplayout.findViewById(R.id.szybkipunkt);
+        statuszoom = (TextView)maplayout.findViewById(R.id.statuszoom);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -225,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView utworzTextViewDlaSpisuPlikow(PlikGPX plik, final CheckBox checkbox) {
         TextView textgpx = new TextView(getApplicationContext());
         textgpx.setTextColor(Color.BLACK);
-        textgpx.setText(plik.nazwa);
+        textgpx.setText(plik.nazwa + Stale.ENTER + plik.rozmiar + "KB, Punkty: " + plik.punkty.size() + ", Trasa: " + Rozne.formatujDystans(Math.round(plik.dlugosctrasy)));
         textgpx.setSingleLine(false);
         textgpx.setMinHeight((int)(50 * getResources().getDisplayMetrics().density));
         textgpx.setMaxLines(3);
@@ -385,6 +388,14 @@ public class MainActivity extends AppCompatActivity {
                     ilosc = ilosc + 1;
                 }
                 if (listacache.get(i).endsWith(Stale.SUFFIXCACHETAB)) {
+                    deleteFile(listacache.get(i));
+                    ilosc = ilosc + 1;
+                }
+                if (listacache.get(i).endsWith(Stale.SUFFIXCACHEMERKATOR)) {
+                    deleteFile(listacache.get(i));
+                    ilosc = ilosc + 1;
+                }
+                if (listacache.get(i).endsWith(Stale.SUFFIXCACHESZER)) {
                     deleteFile(listacache.get(i));
                     ilosc = ilosc + 1;
                 }
@@ -618,6 +629,7 @@ public class MainActivity extends AppCompatActivity {
                 zmienStylJednegoTextView(gpstextview);
                 zmienStylJednegoTextView(luxtextview);
                 zmienStylJednegoTextView(satelitytextview);
+                zmienStylJednegoTextView(statuszoom);
             }
         });
     }
@@ -659,6 +671,10 @@ public class MainActivity extends AppCompatActivity {
     //Ustawia postep bara podczas uruchamiania aplikacji
     public void ustawProgressPrzygotowanie(int poziom) {
         ustawProgressBar(progressbarprzygotowanie, poziom);
+    }
+
+    public void ustawStatusZoom(String string) {
+        ustawTextView(statuszoom, string);
     }
 
     public void pokazIkoneOpisow() {

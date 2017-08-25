@@ -34,6 +34,8 @@ public class Stale {
     //Suffixy plikow Cache
     public static String SUFFIXCACHEDANE = "dane.v1.cache";
     public static String SUFFIXCACHETAB = "tab.v1.cache";
+    public static String SUFFIXCACHESZER = "szer.v1.cache";
+    public static String SUFFIXCACHEMERKATOR = "merkator.v1.cache";
 
     //Obsluga HTTP
     public static String DOWNLOADURL = "http://trzcina.d2.pl/puszcza/gpx2016/download.php";
