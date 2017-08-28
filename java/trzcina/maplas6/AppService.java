@@ -525,6 +525,14 @@ public class AppService extends Service {
         }
     }
 
+    private void przypiszPowrotDoAplikacjiDlaIkony() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingintent = PendingIntent.getActivity(this, 0, intent, 0);
+        widokmalejnotyfikacji.setOnClickPendingIntent(R.id.notlassmall, pendingintent);
+    }
+
     public void utworzNotyfikacje(int numer) {
         RemoteViews widoknotyfikacji = new RemoteViews(getApplicationContext().getPackageName(), R.layout.notyfikacjalayout);
         int ikonywlayout[] = {R.id.icon0, R.id.icon1, R.id.icon2, R.id.icon3, R.id.icon4, R.id.icon5, R.id.icon6, R.id.icon7, R.id.icon8, R.id.icon9, R.id.icon10, R.id.icon11, R.id.icon12, R.id.icon13, R.id.icon14, R.id.icon15, R.id.icon16, R.id.icon17, R.id.icon18, R.id.icon19};
@@ -556,6 +564,7 @@ public class AppService extends Service {
             filtry[i] = new IntentFilter(opisy[i]);
             registerReceiver(odbiorznotyfikacji, filtry[i]);
         }
+        przypiszPowrotDoAplikacjiDlaIkony();
     }
 
     public void notyfikacjaUstawStanGPS(final String string) {
