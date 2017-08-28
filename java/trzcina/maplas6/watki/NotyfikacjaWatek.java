@@ -16,16 +16,21 @@ public class NotyfikacjaWatek extends Thread {
 
     public volatile boolean zakoncz;
     DateFormat formatczasu;
+    public int iloscupdate;
+    public int numernotyfikacji;
 
     public NotyfikacjaWatek() {
         zakoncz = false;
         formatczasu = new SimpleDateFormat("HH:mm:ss");
         formatczasu.setTimeZone(TimeZone.getTimeZone("UTC"));
+        iloscupdate = 0;
+        numernotyfikacji = 100;
+
     }
 
     public void run() {
+        AppService.service.utworzNotyfikacje(numernotyfikacji);
         while (zakoncz == false) {
-            Log.e("NOTYFIKACJA", "watek notyfikacji - petla start");
             AppService.service.notyfikacjaUstawCzas("");
             AppService.service.notyfikacjaUstawSzczegoly("");
             AppService.service.notyfikacjaUstawSatelity("");
@@ -53,8 +58,17 @@ public class NotyfikacjaWatek extends Thread {
             } else {
                 AppService.service.notyfikacjaUstawStanGPS("GPS wylaczony...");
             }
-            AppService.service.notyfikacjaZatwierdz();
-            Rozne.czekaj(2000);
+            AppService.service.notyfikacjaZatwierdz(numernotyfikacji);
+            iloscupdate = iloscupdate + 1;
+            if(iloscupdate >= 900) {
+                AppService.service.notificationmanager.cancel(numernotyfikacji);
+                AppService.service.unregisterReceiver(AppService.service.odbiorznotyfikacji);
+                numernotyfikacji = numernotyfikacji + 1;
+                AppService.service.utworzNotyfikacje(numernotyfikacji);
+                iloscupdate = 0;
+            } else {
+                Rozne.czekaj(2000);
+            }
         }
         AppService.service.notificationmanager.cancelAll();
         AppService.service.unregisterReceiver(AppService.service.odbiorznotyfikacji);

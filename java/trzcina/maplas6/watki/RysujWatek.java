@@ -39,8 +39,8 @@ public class RysujWatek extends Thread {
     private float density;
     public float zoom;
 
-    String[] opisykol = {"20m", "50m", "100m", "200m", "500m", "1km", "2km", "5km", "10km", "20km", "50km", "100km", "200km"};
-    int[] metrykol = {20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000};
+    String[] opisykol = {"1m", "2m", "5m", "10m", "20m", "50m", "100m", "200m", "500m", "1km", "2km", "5km", "10km", "20km", "50km", "100km", "200km"};
+    int[] metrykol = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000};
     boolean[] rysujkola;
     double[] promieniekol;
 
@@ -50,15 +50,15 @@ public class RysujWatek extends Thread {
         przeladujkonfiguracje = false;
         atlas = null;
         density = activity.getResources().getDisplayMetrics().density;
-        rysujkola = new boolean[13];
-        promieniekol = new double[13];
+        rysujkola = new boolean[opisykol.length];
+        promieniekol = new double[metrykol.length];
         zoom = 1;
     }
 
     private void przeliczKola() {
-        for(int kolo = 0; kolo <= 12; kolo++) {
+        for(int kolo = 0; kolo < opisykol.length; kolo++) {
             promieniekol[kolo] = ((double)metrykol[kolo] / (double)tmiparser.rozpietoscxwmetrach) * (double)tmiparser.rozmiarmapy.x;
-            if((promieniekol[kolo] >= 25 * zoom * Painty.density) && (promieniekol[kolo] <= Math.max(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y) * 1.1)) {
+            if((promieniekol[kolo] * zoom >= 30 * Painty.density) && (promieniekol[kolo] * zoom <= Math.max(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y) * 1.1)) {
                 rysujkola[kolo] = true;
             } else {
                 rysujkola[kolo] = false;
@@ -106,7 +106,7 @@ public class RysujWatek extends Thread {
     //Rysujemy srodkowe kolo
     private void rysujKola(Canvas canvas) {
         canvas.drawCircle(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y, Stale.SZEROKOSCSRODKOWEGOKOLA * density, Painty.paintczerwonysrodek);
-        for (int kolo = 0; kolo <= 12; kolo++) {
+        for (int kolo = 0; kolo < opisykol.length; kolo++) {
             if (rysujkola[kolo]) {
                 canvas.drawCircle(AppService.service.srodekekranu.x, AppService.service.srodekekranu.y, (float) (promieniekol[kolo] * zoom), Painty.paintczerwoneokregi);
                 if(AppService.service.kolorinfo == 3) {
@@ -336,6 +336,8 @@ public class RysujWatek extends Thread {
     public void run() {
         while(zakoncz == false) {
 
+            zoom = AppService.service.zoom / (float)10;
+
             //Gdy mamy przeladowac atlas
             if(przeladujkonfiguracje == true) {
                 przeladujKonfiguracje();
@@ -343,7 +345,6 @@ public class RysujWatek extends Thread {
 
             //Gdy mamy cos odswiezyc
             if(odswiez == true) {
-                zoom = AppService.service.zoom / (float)10;
                 if (activity.surface.surfaceholder.getSurface().isValid()) {
                     odswiez = false;
                     odswiezEkran();

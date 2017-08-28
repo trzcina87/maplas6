@@ -94,10 +94,10 @@ public class AppService extends Service {
     public volatile boolean grajdzwieki;
 
     //Notyfikcja
-    public RemoteViews widokmalejnotyfikacji;
-    public NotificationManager notificationmanager;
-    public Notification notyfikacja;
-    public OdbiorZNotyfikacji odbiorznotyfikacji;
+    public volatile RemoteViews widokmalejnotyfikacji;
+    public volatile NotificationManager notificationmanager;
+    public volatile Notification notyfikacja;
+    public volatile OdbiorZNotyfikacji odbiorznotyfikacji;
 
     public long[] plikmerkatora;
 
@@ -295,7 +295,6 @@ public class AppService extends Service {
                 PlikiGPX.szukajPlikow();
 
                 GPXPunktLogger.inicjuj();
-                utworzNotyfikacje();
 
                 //Przechodzimy do widoku mapy i startujemy watki
                 MainActivity.activity.zakonczPrzygotowanie();
@@ -526,7 +525,7 @@ public class AppService extends Service {
         }
     }
 
-    private void utworzNotyfikacje() {
+    public void utworzNotyfikacje(int numer) {
         RemoteViews widoknotyfikacji = new RemoteViews(getApplicationContext().getPackageName(), R.layout.notyfikacjalayout);
         int ikonywlayout[] = {R.id.icon0, R.id.icon1, R.id.icon2, R.id.icon3, R.id.icon4, R.id.icon5, R.id.icon6, R.id.icon7, R.id.icon8, R.id.icon9, R.id.icon10, R.id.icon11, R.id.icon12, R.id.icon13, R.id.icon14, R.id.icon15, R.id.icon16, R.id.icon17, R.id.icon18, R.id.icon19};
         int ikony[] = {R.mipmap.prawdziwek, R.mipmap.rydz, R.mipmap.kania, R.mipmap.kurka, R.mipmap.kowal, R.mipmap.piaskowiec, R.mipmap.czarnylepek, R.mipmap.maslak, R.mipmap.gaska, R.mipmap.kozlarek, R.mipmap.poziomka, R.mipmap.jagoda, R.mipmap.zurawina, R.mipmap.jerzyna, R.mipmap.parking, R.mipmap.atrakcja, R.mipmap.pomnik, R.mipmap.osrodek, R.mipmap.widok, R.mipmap.znacznik2};
@@ -550,7 +549,7 @@ public class AppService extends Service {
         builder = (NotificationCompat.Builder) builder.setCustomBigContentView(widoknotyfikacji).setContent(widokmalejnotyfikacji).setOngoing(true).setPriority(Notification.PRIORITY_MAX).setVisibility(Notification.VISIBILITY_PUBLIC);
         notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notyfikacja = builder.build();
-        notificationmanager.notify(0, notyfikacja);
+        notificationmanager.notify(numer, notyfikacja);
         odbiorznotyfikacji = new OdbiorZNotyfikacji();
         IntentFilter[] filtry = new IntentFilter[ikony.length];
         for(int i = 0; i < ikony.length; i++) {
@@ -599,9 +598,9 @@ public class AppService extends Service {
         }
     }
 
-    public void notyfikacjaZatwierdz() {
+    public void notyfikacjaZatwierdz(int numer) {
         try {
-            notificationmanager.notify(0, notyfikacja);
+            notificationmanager.notify(numer, notyfikacja);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -695,6 +694,7 @@ public class AppService extends Service {
         } else {
             if(zoom > 10) {
                 zoom = zoom - 5;
+                rysujwatek.przeladujkonfiguracje = true;
                 rysujwatek.odswiez = true;
             } else {
                 int index = atlas.parserytmi.indexOf(tmiparser);
@@ -784,6 +784,7 @@ public class AppService extends Service {
             if(index == atlas.parserytmi.size() - 1) {
                 if(zoom < 80) {
                     zoom = zoom + 5;
+                    rysujwatek.przeladujkonfiguracje = true;
                     rysujwatek.odswiez = true;
                 } else {
                     MainActivity.activity.pokazToast(Komunikaty.BLADPRZYBLIZANIA);
