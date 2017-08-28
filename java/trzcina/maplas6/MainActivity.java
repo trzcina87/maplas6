@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,8 +35,10 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import trzcina.maplas6.atlasy.Atlasy;
 import trzcina.maplas6.lokalizacja.PlikGPX;
@@ -124,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
     public AudioManager audiomanager;
     public int soundfixerror;
     public int soundfixok;
+
+    public SimpleDateFormat formatczasu;
 
     //Dla danego id zasobu (w res/layout) zwraca widok
     private LinearLayout znajdzLinearLayout(int zasob) {
@@ -230,9 +235,11 @@ public class MainActivity extends AppCompatActivity {
         TextView textgpx = new TextView(getApplicationContext());
         textgpx.setTextColor(Color.BLACK);
         textgpx.setText(plik.nazwa + Stale.ENTER + plik.rozmiar + "KB, Punkty: " + plik.punkty.size() + ", Trasa: " + Rozne.formatujDystans(Math.round(plik.dlugosctrasy)));
+        if(plik.czastrasy > 0) {
+            textgpx.append(" " + formatczasu.format(plik.czastrasy) + "h");
+        }
         textgpx.setSingleLine(false);
-        textgpx.setMinHeight((int)(50 * getResources().getDisplayMetrics().density));
-        textgpx.setMaxLines(3);
+        textgpx.setMaxLines(2);
         textgpx.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         textgpx.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,9 +260,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void dodajPozycjeDoSpisuPlikow(PlikGPX plik) {
         LinearLayout wpisgpx = new LinearLayout(getApplicationContext());
+        wpisgpx.setGravity(Gravity.CENTER_VERTICAL);
+        wpisgpx.setMinimumHeight((int) (Painty.density * 50));
         wpisgpx.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         CheckBox checkbox = utworzCheckBoxDlaSpisuPlikow(plik);
         TextView textgpx = utworzTextViewDlaSpisuPlikow(plik, checkbox);
+        textgpx.setTextSize(Painty.density * 4);
         wpisgpx.addView(checkbox);
         wpisgpx.addView(textgpx);
         spisplikow.addView(wpisgpx);
@@ -859,6 +869,11 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
     }
 
+    private void ustawFormatDatyDlaSpisuPlikow() {
+        formatczasu = new SimpleDateFormat("HH:mm");
+        formatczasu.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -875,6 +890,7 @@ public class MainActivity extends AppCompatActivity {
         ustawAudio();
         ustawWidokWProjektuj();
         Painty.inicjujPainty();
+        ustawFormatDatyDlaSpisuPlikow();
 
         //Obsluga uprawnien i ustawien
         Uprawnienia.zainicjujUprawnienia();

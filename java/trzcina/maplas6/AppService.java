@@ -32,9 +32,12 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.Atlasy;
@@ -76,6 +79,7 @@ public class AppService extends Service {
     public LocationManager locationmanager;
     public boolean gpszarejestrowany;
     public volatile int kolorinfo;
+    private DateFormat formatczasu;
 
 
     //Watki programu
@@ -141,6 +145,8 @@ public class AppService extends Service {
         odbiorznotyfikacji = null;
         plikmerkatora = null;
         zoom = 10;
+        formatczasu = new SimpleDateFormat("H:mm");
+        formatczasu.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Nullable
@@ -476,7 +482,9 @@ public class AppService extends Service {
                 if(lokalizacja != null) {
                     odlegloscodkursora = PunktWTrasie.zmierzDystans(new PunktWTrasie(gpsx, gpsy), new PunktWTrasie((float)lokalizacja.getLongitude(), (float) lokalizacja.getLatitude()));
                 }
-                MainActivity.activity.ustawGPSText(Rozne.formatujDystans(Math.round(dystans)) + " " + Rozne.formatujDystans(Math.round(odlegloscodpoczatku)) + " " + Rozne.formatujDystans(Math.round(odlegloscodkursora)));
+                long czas = System.currentTimeMillis() - obecnatrasa.czasstart;
+                String czasstring = formatczasu.format(czas);
+                MainActivity.activity.ustawGPSText(Rozne.formatujDystans(Math.round(dystans)) + " " + Rozne.formatujDystans(Math.round(odlegloscodpoczatku)) + " " + Rozne.formatujDystans(Math.round(odlegloscodkursora)) + " " + czasstring + "h");
             }
         }
     }

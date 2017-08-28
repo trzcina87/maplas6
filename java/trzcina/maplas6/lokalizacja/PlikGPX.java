@@ -1,5 +1,7 @@
 package trzcina.maplas6.lokalizacja;
 
+import android.util.Log;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -12,8 +14,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,6 +37,7 @@ public class PlikGPX {
     public Boolean zaznaczony;
     public long rozmiar;
     public float dlugosctrasy;
+    public long czastrasy;
 
     public PlikGPX(String sciezka) {
         this.sciezka = sciezka;
@@ -40,6 +48,7 @@ public class PlikGPX {
         zaznaczony = false;
         rozmiar = 0;
         dlugosctrasy = 0;
+        czastrasy = 0;
         try {
             rozmiar = new File(sciezka).length();
             rozmiar = Math.round(rozmiar / (double)1024);
@@ -132,16 +141,39 @@ public class PlikGPX {
     private void szukajTRK(Document dokument) {
         NodeList lista = dokument.getElementsByTagName("trkpt");
         PunktWTrasie poprzedni = null;
+        long czasstart = 0;
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateFormat.setTimeZone(tz);
+        Element element = null;
         for(int i = 0; i < lista.getLength(); i++) {
             Node node = lista.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
+                element = (Element) node;
                 PunktWTrasie punktwtrasie = new PunktWTrasie(Float.parseFloat(element.getAttribute("lon")), Float.parseFloat(element.getAttribute("lat")));
                 trasa.add(punktwtrasie);
+                if(poprzedni == null) {
+                    String data = pobierzWartoscParametru("time", element);
+                    try {
+                        Date datad = dateFormat.parse(data);
+                        czasstart = datad.getTime();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
                 if(poprzedni != null) {
                     dlugosctrasy = dlugosctrasy + PunktWTrasie.zmierzDystans(poprzedni, punktwtrasie);
                 }
                 poprzedni = punktwtrasie;
+            }
+        }
+        if(poprzedni != null) {
+            String data = pobierzWartoscParametru("time", element);
+            try {
+                Date datakoniec = dateFormat.parse(data);
+                czastrasy = datakoniec.getTime() - czasstart;
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
     }
