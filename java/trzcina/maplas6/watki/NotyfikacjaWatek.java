@@ -1,6 +1,7 @@
 package trzcina.maplas6.watki;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +25,7 @@ public class NotyfikacjaWatek extends Thread {
 
     public void run() {
         while (zakoncz == false) {
+            Log.e("NOTYFIKACJA", "watek notyfikacji - petla start");
             AppService.service.notyfikacjaUstawCzas("");
             AppService.service.notyfikacjaUstawSzczegoly("");
             AppService.service.notyfikacjaUstawSatelity("");

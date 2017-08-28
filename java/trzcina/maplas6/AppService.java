@@ -560,81 +560,51 @@ public class AppService extends Service {
     }
 
     public void notyfikacjaUstawStanGPS(final String string) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjastangps, string);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        try {
+            widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjastangps, string);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void notyfikacjaUstawSatelity(final String string) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjailoscsatelit, string);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        try {
+            widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjailoscsatelit, string);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void notyfikacjaUstawSzczegoly(final String string) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjaszczegolytrasy, string);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        try {
+            widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjaszczegolytrasy, string);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void notyfikacjaUstawCzas(final String string) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjaczas, string);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        try {
+            widokmalejnotyfikacji.setTextViewText(R.id.notyfikacjaczas, string);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void notyfikacjaUstawIkoneGPS(final int zasob) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    widokmalejnotyfikacji.setImageViewResource(R.id.notyfikacjaikonasatelity, zasob);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        try {
+            widokmalejnotyfikacji.setImageViewResource(R.id.notyfikacjaikonasatelity, zasob);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void notyfikacjaZatwierdz() {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    notificationmanager.notify(0, notyfikacja);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        try {
+            notificationmanager.notify(0, notyfikacja);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean zapiszPunktPozycjaKursora(String nazwa, String komentarz) {
