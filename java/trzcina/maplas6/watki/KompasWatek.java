@@ -48,7 +48,7 @@ public class KompasWatek extends Thread implements SensorEventListener {
     //Odczyt wartosci kata, jesli nowy to odswiezamy rysunek
     @Override
     public void onSensorChanged(SensorEvent event) {
-        int kattmp = Math.round(event.values[0]) + zwrocKatUrzadzenia();
+        int kattmp = (Math.round(event.values[0]) + zwrocKatUrzadzenia()) % 360;
         if(kattmp != kat) {
             kat = kattmp;
             AppService.service.rysujwatek.odswiez = true;
