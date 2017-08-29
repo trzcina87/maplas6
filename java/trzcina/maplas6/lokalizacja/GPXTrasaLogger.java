@@ -1,5 +1,7 @@
 package trzcina.maplas6.lokalizacja;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -79,6 +81,24 @@ public class GPXTrasaLogger {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public synchronized void zakonczPlikIOdrzuc() {
+        if(printwriter != null) {
+            try {
+                printwriter.println("    </trkseg>");
+                printwriter.println("  </trk>");
+                printwriter.println("</gpx>");
+                printwriter.flush();
+                printwriter.close();
+                printwriter = null;
+                filewriter = null;
+                new File(Stale.SCIEZKAMAPLAS + nazwapliku).renameTo(new File(Stale.SCIEZKAMAPLAS + Stale.FOLDERKOSZ + "/" + nazwapliku));
+                nazwapliku = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

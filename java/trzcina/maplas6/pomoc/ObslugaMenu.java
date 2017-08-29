@@ -57,7 +57,7 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
 
             case R.id.gpsitem:
                 AppService.service.wlaczgps = ! AppService.service.wlaczgps;
-                AppService.service.zmianaTrybuGPS();
+                AppService.service.zmianaTrybuGPS(false);
                 return true;
 
             //Pozycja w menu: Informacja

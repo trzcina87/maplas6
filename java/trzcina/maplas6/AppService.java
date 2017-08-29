@@ -184,7 +184,7 @@ public class AppService extends Service {
         }
     }
 
-    public void zmianaTrybuGPS() {
+    public void zmianaTrybuGPS(boolean usunacplik) {
         if(wlaczgps == true) {
             gpslistener.zerujZmienne();
             obecnatrasa = new GPXTrasaLogger();
@@ -192,7 +192,11 @@ public class AppService extends Service {
         } else {
             wyrejestrujGPS();
             if(obecnatrasa != null) {
-                obecnatrasa.zakonczPlik();
+                if(usunacplik == false) {
+                    obecnatrasa.zakonczPlik();
+                } else {
+                    obecnatrasa.zakonczPlikIOdrzuc();
+                }
             }
             gpslistener.zerujZmienne();
             obecnatrasa = null;

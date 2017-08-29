@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -744,6 +745,20 @@ public class MainActivity extends AppCompatActivity {
                 menuglowne.show();
             }
         });
+        registerForContextMenu(menuimageview);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if((AppService.service.obecnatrasa != null) && (AppService.service.wlaczgps == true)) {
+            new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle(Komunikaty.USUNAC).setMessage(Komunikaty.USUNACOBECNA).setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AppService.service.wlaczgps = !AppService.service.wlaczgps;
+                    AppService.service.zmianaTrybuGPS(true);
+                }
+            }).setNegativeButton("Nie", null).show();
+        }
     }
 
     private float obliczGlosnosc() {
