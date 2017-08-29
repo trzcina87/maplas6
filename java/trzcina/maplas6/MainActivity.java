@@ -743,6 +743,7 @@ public class MainActivity extends AppCompatActivity {
                 menuglowne.getMenu().findItem(R.id.gpsitem).setChecked(AppService.service.wlaczgps);
                 menuglowne.getMenu().findItem(R.id.precyzjagps).setChecked(AppService.service.precyzyjnygps);
                 menuglowne.getMenu().findItem(R.id.dzwiekiitem).setChecked(AppService.service.grajdzwieki);
+                menuglowne.getMenu().findItem(R.id.trybsamochodowyitem).setChecked(AppService.service.trybsamochodowy);
                 menuglowne.show();
             }
         });

@@ -99,6 +99,7 @@ public class AppService extends Service {
     public volatile boolean wlaczgps;
     public volatile boolean precyzyjnygps;
     public volatile boolean grajdzwieki;
+    public volatile boolean trybsamochodowy;
 
     //Notyfikcja
     public volatile RemoteViews widokmalejnotyfikacji;
@@ -141,6 +142,7 @@ public class AppService extends Service {
         precyzyjnygps = true;
         wlaczgps = false;
         grajdzwieki = true;
+        trybsamochodowy = false;
         gpszarejestrowany = false;
         przesuwajmapezgps = false;
         poziominfo = Stale.OPISYPUNKTY;
@@ -173,7 +175,11 @@ public class AppService extends Service {
         if(gpszarejestrowany == false) {
             czakamnapierwszyfix = true;
             dzwiekiwatek.zagralemblad = false;
-            locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, gpslistener, loopergps);
+            if(trybsamochodowy == false) {
+                locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Stale.GPSREGISTERCZAS, Stale.GPSREGISTERMETRYPIESZY, gpslistener, loopergps);
+            } else {
+                locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Stale.GPSREGISTERCZAS, Stale.GPSREGISTERMETRYSAMOCHODOWY, gpslistener, loopergps);
+            }
             locationmanager.addGpsStatusListener(gpslistener);
             dzwiekiwatek.czasostatniejlokalizacji = System.currentTimeMillis();
             gpszarejestrowany = true;

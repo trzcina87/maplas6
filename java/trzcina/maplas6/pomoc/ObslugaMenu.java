@@ -38,6 +38,13 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
                 MainActivity.activity.pokazToast(Komunikaty.RESETAGPS);
                 return true;
 
+            case R.id.trybsamochodowyitem:
+                AppService.service.trybsamochodowy = ! AppService.service.trybsamochodowy;
+                if(AppService.service.wlaczgps == true) {
+                    MainActivity.activity.pokazToast(Komunikaty.TRYBSAMOCHODOWY);
+                }
+                return true;
+
             //Pozycja w menu: Ustawienia
             case R.id.ustawieniaitem:
                 MainActivity.activity.pokazOpcjeView();

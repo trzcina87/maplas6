@@ -16,4 +16,5 @@ public class Komunikaty {
     public static final String ZMIANAMAPY = "Dokladniejsza mapa?";
     public static final String DOKLADNIEJSZAMAPA = " jest dokladniejsza od obecnej. Wczytac?";
     public static final String USUNACOBECNA = "Czy zakończyć GPS bez zapisywania trasy?";
+    public static final String TRYBSAMOCHODOWY = "Ustawienie będzie obowiązywac dla nowej trasy. Zakoncz obecna!";
 }
