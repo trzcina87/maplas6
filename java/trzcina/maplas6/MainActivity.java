@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
     public int soundfixok;
 
     public SimpleDateFormat formatczasu;
+    public volatile boolean activitywidoczne;
 
     //Dla danego id zasobu (w res/layout) zwraca widok
     private LinearLayout znajdzLinearLayout(int zasob) {
@@ -905,6 +906,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
+        activitywidoczne = true;
 
         //Obsluga elementow graficznych
         znajdzLayouty();
@@ -927,6 +929,37 @@ public class MainActivity extends AppCompatActivity {
         if(Uprawnienia.czyNadane() == true) {
             wysartujService();
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        activitywidoczne = false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        activitywidoczne = true;
+        if(AppService.service != null) {
+            AppService.service.odswiezUI();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        activitywidoczne = true;
+        if(AppService.service != null) {
+            AppService.service.odswiezUI();
+        }
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        activitywidoczne = false;
     }
 
     //Obsluga uprawnien, aplikcji nie ma sensu uruchamiac jesli uzytkownik nie dal uprawnien
@@ -1017,6 +1050,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        activitywidoczne = false;
     }
 
     //Reakcja na przycisk wstecz, albo zamkniecie aplikacji albo wyjscie do widoku mapy

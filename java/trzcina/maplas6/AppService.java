@@ -521,10 +521,12 @@ public class AppService extends Service {
     }
 
     public void odswiezUI() {
-        odswiezUIGPS();
-        odswiezUISatelity();
-        odswiezUIIkonaSatelity();
-        odswiezUIZoom();
+        if(MainActivity.activity.activitywidoczne == true) {
+            odswiezUIGPS();
+            odswiezUISatelity();
+            odswiezUIIkonaSatelity();
+            odswiezUIZoom();
+        }
     }
 
     public void zmienKolorInfo() {

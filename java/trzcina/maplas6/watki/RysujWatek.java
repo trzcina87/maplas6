@@ -13,6 +13,7 @@ import android.util.Log;
 import java.util.List;
 
 import trzcina.maplas6.AppService;
+import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.TmiParser;
 import trzcina.maplas6.lokalizacja.GPXPunktLogger;
@@ -336,24 +337,28 @@ public class RysujWatek extends Thread {
     public void run() {
         while(zakoncz == false) {
 
-            zoom = AppService.service.zoom / (float)10;
+            if(MainActivity.activity.activitywidoczne == true) {
+                zoom = AppService.service.zoom / (float) 10;
 
-            //Gdy mamy przeladowac atlas
-            if(przeladujkonfiguracje == true) {
-                przeladujKonfiguracje();
-            }
-
-            //Gdy mamy cos odswiezyc
-            if(odswiez == true) {
-                if (activity.surface.surfaceholder.getSurface().isValid()) {
-                    odswiez = false;
-                    odswiezEkran();
+                //Gdy mamy przeladowac atlas
+                if (przeladujkonfiguracje == true) {
+                    przeladujKonfiguracje();
                 }
-            }
 
-            //jesli nie mamy nic rysowac, krotka przerwa
-            if(odswiez == false) {
-                Rozne.czekaj(5);
+                //Gdy mamy cos odswiezyc
+                if (odswiez == true) {
+                    if (activity.surface.surfaceholder.getSurface().isValid()) {
+                        odswiez = false;
+                        odswiezEkran();
+                    }
+                }
+
+                //jesli nie mamy nic rysowac, krotka przerwa
+                if (odswiez == false) {
+                    Rozne.czekaj(5);
+                }
+            } else {
+                Rozne.czekaj(20);
             }
         }
     }

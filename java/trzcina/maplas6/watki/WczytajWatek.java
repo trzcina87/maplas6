@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import trzcina.maplas6.AppService;
+import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.TmiParser;
 import trzcina.maplas6.pomoc.Rozne;
@@ -240,13 +241,17 @@ public class WczytajWatek extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            if(przeladujkonfiguracje == true) {
-                przeladujKonfiguracje();
+            if(MainActivity.activity.activitywidoczne == true) {
+                if (przeladujkonfiguracje == true) {
+                    przeladujKonfiguracje();
+                }
+                if (atlas != null) {
+                    sprawdzWczytanieBitmap();
+                }
+                Rozne.czekaj(5);
+            } else {
+                Rozne.czekaj(20);
             }
-            if(atlas != null) {
-                sprawdzWczytanieBitmap();
-            }
-            Rozne.czekaj(5);
         }
     }
 }
