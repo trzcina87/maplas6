@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             textgpx.append(" " + formatczasu.format(plik.czastrasy) + "h");
         }
         textgpx.setSingleLine(false);
-        textgpx.setMaxLines(2);
+        textgpx.setMaxLines(3);
         textgpx.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         textgpx.setOnClickListener(new View.OnClickListener() {
             @Override
