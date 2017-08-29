@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
+import trzcina.maplas6.AppService;
 import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.ustawienia.Ustawienia;
 
@@ -19,7 +20,23 @@ public class GPXPunktLogger {
     private static FileWriter filewriter = null;
     private static PrintWriter printwriter = null;
     public static String nazwapliku = null;
+    public static String nazwaplikdata = null;
     public static List<PunktNaMapie> lista = new ArrayList<>(1000);
+
+    private static String pobierzSkroconaNazweAtlasu(String nazwa) {
+        String[] tablica = nazwa.split(" ");
+        String nazwaskrocona = "";
+        for(int i = 0; i < tablica.length; i++) {
+            if(tablica[i].length() > 0) {
+                if (Character.isUpperCase(tablica[i].charAt(0))) {
+                    nazwa = nazwa + tablica[i] + " ";
+                } else {
+                    break;
+                }
+            }
+        }
+        return nazwa.trim();
+    }
 
     public static void inicjuj() {
         filewriter = null;
@@ -31,7 +48,7 @@ public class GPXPunktLogger {
     private static void otworzPlik() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss");
         dateFormat.setTimeZone(TimeZone.getDefault());
-        String nazwaplikdata = dateFormat.format(System.currentTimeMillis());
+        nazwaplikdata = dateFormat.format(System.currentTimeMillis());
         nazwapliku = Ustawienia.nazwaurzadzenia.wartosc + " " + nazwaplikdata + " wpt.gpx";
         try {
             filewriter = new FileWriter(new File(Stale.SCIEZKAMAPLAS + nazwapliku));
@@ -75,7 +92,12 @@ public class GPXPunktLogger {
                 printwriter.write("</gpx>");
                 printwriter.flush();
                 printwriter.close();
+                if(AppService.service.atlas != null) {
+                    String skroconanazwa = pobierzSkroconaNazweAtlasu(AppService.service.atlas.nazwa);
+                    new File(Stale.SCIEZKAMAPLAS + nazwapliku).renameTo(new File(Stale.SCIEZKAMAPLAS + Ustawienia.nazwaurzadzenia.wartosc + " " + skroconanazwa + " " + nazwaplikdata + " wpt.gpx"));
+                }
                 nazwapliku = null;
+                nazwaplikdata = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }

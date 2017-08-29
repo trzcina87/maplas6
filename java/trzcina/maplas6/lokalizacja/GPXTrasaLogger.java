@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import trzcina.maplas6.AppService;
 import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.ustawienia.Ustawienia;
 
@@ -23,11 +24,27 @@ public class GPXTrasaLogger {
     public float dlugosctrasy;
     public float odlegloscodpoczatku;
     public long czasstart;
+    public String nazwaplikdata;
+
+    private static String pobierzSkroconaNazweAtlasu(String nazwa) {
+        String[] tablica = nazwa.split(" ");
+        String nazwaskrocona = "";
+        for(int i = 0; i < tablica.length; i++) {
+            if(tablica[i].length() > 0) {
+                if (Character.isUpperCase(tablica[i].charAt(0))) {
+                    nazwa = nazwa + tablica[i] + " ";
+                } else {
+                    break;
+                }
+            }
+        }
+        return nazwa.trim();
+    }
 
     private void utworzNazwe() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss");
         dateFormat.setTimeZone(TimeZone.getDefault());
-        String nazwaplikdata = dateFormat.format(System.currentTimeMillis());
+        nazwaplikdata = dateFormat.format(System.currentTimeMillis());
         nazwapliku = Ustawienia.nazwaurzadzenia.wartosc + " " + nazwaplikdata + ".gpx";
     }
 
@@ -49,6 +66,7 @@ public class GPXTrasaLogger {
         filewriter = null;
         printwriter = null;
         nazwapliku = null;
+        nazwaplikdata = null;
         lista = new PunktWTrasie[50000];
         dlugosc = 0;
         dlugosctrasy = 0;
@@ -110,8 +128,15 @@ public class GPXTrasaLogger {
                 printwriter.println("</gpx>");
                 printwriter.flush();
                 printwriter.close();
+                if(AppService.service.atlas != null) {
+                    String skroconanazwa = pobierzSkroconaNazweAtlasu(AppService.service.atlas.nazwa);
+                    String nowanazwa = Ustawienia.nazwaurzadzenia.wartosc + " " + skroconanazwa + " " + nazwaplikdata + ".gpx";
+                    new File(Stale.SCIEZKAMAPLAS + nazwapliku).renameTo(new File(Stale.SCIEZKAMAPLAS + nowanazwa));
+                    nazwapliku = nowanazwa;
+                }
                 PlikiGPX.dodatkowoSparsujIZaznacz(new File(nazwapliku).getName());
                 nazwapliku = null;
+                nazwaplikdata = null;
                 printwriter = null;
                 filewriter = null;
             } catch (Exception e) {
