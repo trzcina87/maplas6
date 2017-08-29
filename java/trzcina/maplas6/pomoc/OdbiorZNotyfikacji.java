@@ -15,7 +15,7 @@ public class OdbiorZNotyfikacji extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Location lokalizacja = AppService.service.czyJestFix();
         if(lokalizacja != null) {
-            boolean zapis = GPXPunktLogger.zapiszPunkt(Rozne.zaokraglij5((float) lokalizacja.getLongitude()), Rozne.zaokraglij5((float) lokalizacja.getLatitude()), intent.getAction(), "");
+            boolean zapis = GPXPunktLogger.zapiszPunkt(Rozne.zaokraglij5((float) lokalizacja.getLongitude()), Rozne.zaokraglij5((float) lokalizacja.getLatitude()), intent.getAction(), "", lokalizacja.getAccuracy());
             if(zapis) {
                 MainActivity.activity.pokazToast("Zapisano: " + intent.getAction());
             } else {

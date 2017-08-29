@@ -56,8 +56,9 @@ public class GPXTrasaLogger {
         czasstart = System.currentTimeMillis();
     }
 
-    public synchronized boolean zapiszPunkt(float wspx, float wspy) {
+    public synchronized boolean zapiszPunkt(float wspx, float wspy, float dokladnosc) {
         try {
+            int dok = Math.round(dokladnosc);
             String linia = "      <trkpt lon='" + wspx + "' lat='" + wspy + "'>";
             Date datanum = new Date(System.currentTimeMillis());
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -66,6 +67,7 @@ public class GPXTrasaLogger {
             String liniadata = "        <time>" + data + "</time>";
             printwriter.println(linia);
             printwriter.println(liniadata);
+            printwriter.println("        <desc>" + "dokladnosc:" + dok + "</desc>");
             printwriter.println("      </trkpt>");
             printwriter.flush();
             lista[dlugosc] = new PunktWTrasie(wspx, wspy);

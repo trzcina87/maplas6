@@ -44,7 +44,7 @@ public class GPXPunktLogger {
         }
     }
 
-    public static boolean zapiszPunkt(float wspx, float wspy, String nazwa, String komentarz) {
+    public static boolean zapiszPunkt(float wspx, float wspy, String nazwa, String komentarz, float dokladnosc) {
         if(nazwapliku == null) {
             otworzPlik();
         }
@@ -53,10 +53,12 @@ public class GPXPunktLogger {
         String data = dateFormat.format(System.currentTimeMillis());
         String liniadata = "    <time>" + data + "</time>";
         try {
+            int dok = Math.round(dokladnosc);
             printwriter.println("  <wpt lon='" + wspx + "' lat='" + wspy + "'>");
             printwriter.println(liniadata);
             printwriter.println("    <name>" + nazwa + "</name>");
             printwriter.println("    <cmt>" + komentarz + "</cmt>");
+            printwriter.println("    <desc>" + "dokladnosc:" + dok + "</desc>");
             printwriter.println("  </wpt>");
             printwriter.flush();
             lista.add(new PunktNaMapie(wspx, wspy, nazwa, komentarz));

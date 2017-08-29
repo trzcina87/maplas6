@@ -20,6 +20,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 
     public static volatile int iloscsatelitow;
     public static volatile int iloscaktywnychsatelitow;
+    public static volatile int dokladnosc;
 
     public GPSListener() {
         ostatnialokalizacja = null;
@@ -33,7 +34,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
                 if(obecnatrasa.dlugosc == 0) {
                     AppService.service.zaproponujZmianeMapy(new Location(location));
                 }
-                obecnatrasa.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()));
+                obecnatrasa.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()), location.getAccuracy());
                 ostatnialokalizacja = location;
                 AppService.service.dzwiekiwatek.czasostatniejlokalizacji = System.currentTimeMillis();
             }
@@ -62,6 +63,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
         iloscsatelitow = 0;
         ostatnialokalizacjazgps = null;
         ostatnialokalizacja = null;
+        dokladnosc = 0;
     }
 
     @Override
@@ -87,6 +89,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
                 ostatnialokalizacjazgps = AppService.service.locationmanager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if(ostatnialokalizacja != null) {
                     AppService.service.dzwiekiwatek.czasostatniejlokalizacji = ostatnialokalizacjazgps.getTime();
+                    dokladnosc = Math.round(ostatnialokalizacjazgps.getAccuracy());
                 }
                 AppService.service.rysujwatek.odswiez = true;
                 AppService.service.odswiezUI();
@@ -96,11 +99,13 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
             case GpsStatus.GPS_EVENT_STARTED:
                 iloscaktywnychsatelitow = 0;
                 iloscsatelitow = 0;
+                dokladnosc = 0;
                 ostatnialokalizacjazgps = null;
                 break;
             case GpsStatus.GPS_EVENT_STOPPED:
                 iloscaktywnychsatelitow = 0;
                 iloscsatelitow = 0;
+                dokladnosc = 0;
                 ostatnialokalizacjazgps = null;
                 break;
         }

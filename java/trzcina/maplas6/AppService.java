@@ -490,7 +490,7 @@ public class AppService extends Service {
     }
 
     private void odswiezUISatelity() {
-        MainActivity.activity.ustawSatelityText(gpslistener.iloscaktywnychsatelitow + "/" + gpslistener.iloscsatelitow + " ");
+        MainActivity.activity.ustawSatelityText(gpslistener.iloscaktywnychsatelitow + "/" + gpslistener.iloscsatelitow + " (" + gpslistener.dokladnosc + "m)");
     }
 
     private void odswiezUIIkonaSatelity() {
@@ -627,7 +627,7 @@ public class AppService extends Service {
         if(tmiparser != null) {
             float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnamapienadsrodkiem.x));
             float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnamapienadsrodkiem.y));
-            Boolean czyzpias = GPXPunktLogger.zapiszPunkt(gpsx, gpsy, nazwa, komentarz);
+            Boolean czyzpias = GPXPunktLogger.zapiszPunkt(gpsx, gpsy, nazwa, komentarz, -1);
             rysujwatek.odswiez = true;
             if(czyzpias == true) {
                 return true;
@@ -642,7 +642,7 @@ public class AppService extends Service {
     public boolean zapiszPunktPozycjaGPS(String nazwa, String komentarz) {
         Location location = czyJestFix();
         if(location != null) {
-            Boolean czyzapis = GPXPunktLogger.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()), nazwa, komentarz);
+            Boolean czyzapis = GPXPunktLogger.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()), nazwa, komentarz, location.getAccuracy());
             rysujwatek.odswiez = true;
             if(czyzapis == true) {
                 return true;
