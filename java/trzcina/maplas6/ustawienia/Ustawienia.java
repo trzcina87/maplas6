@@ -73,4 +73,12 @@ public class Ustawienia {
             ustawienia.get(i).zapiszDoUstawien();
         }
     }
+
+    public static void uzupelnijPoleWOpcjachZDomyslnych() {
+        for(int i = 0; i < ustawienia.size(); i++) {
+            if((ustawienia.get(i) != Ustawienia.folderzmapami) && (ustawienia.get(i) != Ustawienia.atlas)){
+                ustawienia.get(i).uzupelnijPoleWOpcjachZDomyslnych();
+            }
+        }
+    }
 }

@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
     public Button projektujzapisz;
     public Button projektujzapiszpoziom;
     public Button wyczysccache;
+    public Button ustawieniadomyslne;
 
     public SoundPool soundpula;
     public AudioManager audiomanager;
@@ -203,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
         satelitytextview = (TextView)maplayout.findViewById(R.id.statussatelity);
         satelitaimageview = (ImageView)maplayout.findViewById(R.id.imageviewsatelita);
         wyczysccache = (Button)opcjezaawansowanelayout.findViewById(R.id.wyczysccache);
+        ustawieniadomyslne = (Button)opcjezaawansowanelayout.findViewById(R.id.ustawieniadomyslne);
         szybkipunktimageview = (ImageView)maplayout.findViewById(R.id.szybkipunkt);
         statuszoom = (TextView)maplayout.findViewById(R.id.statuszoom);
     }
@@ -387,6 +389,10 @@ public class MainActivity extends AppCompatActivity {
         if(ilezaznaczonych == 0) {
             MainActivity.activity.pokazToast("Zaznacz pliki do wysłania!");
         }
+    }
+
+    public void ustawieniaDomyslne() {
+
     }
 
     public void wyczyscCache() {
@@ -609,6 +615,12 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     pokazToast("Blad zapisu! Sprawdz GPS!");
                 }
+            }
+        });
+        ustawieniadomyslne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Ustawienia.uzupelnijPoleWOpcjachZDomyslnych();
             }
         });
     }

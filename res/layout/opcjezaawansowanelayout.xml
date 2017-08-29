@@ -86,6 +86,13 @@
                 android:text="Wyczyść cache"
                 android:layout_height="wrap_content" />
 
+            <Button
+                android:layout_width="match_parent"
+                android:paddingTop="12dp"
+                android:id="@+id/ustawieniadomyslne"
+                android:text="Ustawienia domyślne"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 

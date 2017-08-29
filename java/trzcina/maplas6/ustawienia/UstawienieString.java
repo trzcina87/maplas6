@@ -52,6 +52,13 @@ public class UstawienieString {
         }
     }
 
+    //Uzupelnia wartosc w widoku
+    public void uzupelnijPoleWOpcjachZDomyslnych() {
+        if(polewopjach instanceof EditText) {
+            ((EditText) polewopjach).setText(wartoscdomyslna);
+        }
+    }
+
     //Zapisuje wartosc z widoku do telefonu
     public void zapiszDoUstawien() {
         if(polewopjach instanceof EditText) {
