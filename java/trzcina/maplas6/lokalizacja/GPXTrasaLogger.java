@@ -32,13 +32,13 @@ public class GPXTrasaLogger {
         for(int i = 0; i < tablica.length; i++) {
             if(tablica[i].length() > 0) {
                 if (Character.isUpperCase(tablica[i].charAt(0))) {
-                    nazwa = nazwa + tablica[i] + " ";
+                    nazwaskrocona = nazwaskrocona + tablica[i] + " ";
                 } else {
                     break;
                 }
             }
         }
-        return nazwa.trim();
+        return nazwaskrocona.trim();
     }
 
     private void utworzNazwe() {
