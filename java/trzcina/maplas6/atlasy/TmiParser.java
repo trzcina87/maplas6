@@ -27,6 +27,7 @@ import trzcina.maplas6.pomoc.MD5;
 import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class TmiParser {
 
     public String sciezka;                  //Sciezka pliku TMI
@@ -244,7 +245,17 @@ public class TmiParser {
 
     //Sprawdzamy czy istnieja pliki Cache
     private boolean sprawdzCache() {
-        if((Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHEDANE)) && (Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHETAB)) && (Arrays.asList(MainActivity.activity.fileList()).contains(md5sciezka + Stale.SUFFIXCACHESZER))) {
+        List<String> lista = AppService.service.listaplikowaplikacji;
+        if((lista.contains(md5sciezka + Stale.SUFFIXCACHEDANE)) && (lista.contains(md5sciezka + Stale.SUFFIXCACHETAB))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean sprawdzCacheSzerokosci() {
+        List<String> lista = AppService.service.listaplikowaplikacji;
+        if(lista.contains(md5sciezka + Stale.SUFFIXCACHESZER)) {
             return true;
         } else {
             return false;
@@ -321,7 +332,12 @@ public class TmiParser {
         wczytajDrugiPlik();
         uzupelnijPolaPomocnicze();
         if(merkator == true) {
-            wczytajTrzeciPlik();
+            if(sprawdzCacheSzerokosci() == true) {
+                wczytajTrzeciPlik();
+            } else {
+                obliczSzerokosciDlaPikseli();
+                zapiszCache();
+            }
         }
     }
 

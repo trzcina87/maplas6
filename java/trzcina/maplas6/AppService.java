@@ -29,12 +29,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -102,6 +105,8 @@ public class AppService extends Service {
     public volatile NotificationManager notificationmanager;
     public volatile Notification notyfikacja;
     public volatile OdbiorZNotyfikacji odbiorznotyfikacji;
+
+    public List<String> listaplikowaplikacji;
 
     public long[] plikmerkatora;
 
@@ -272,6 +277,8 @@ public class AppService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
+
+                listaplikowaplikacji = Arrays.asList(MainActivity.activity.fileList());
 
                 //Tworzymy niezbene katalogi
                 MainActivity.activity.ustawProgressPrzygotowanie(1);
@@ -737,7 +744,7 @@ public class AppService extends Service {
     }
 
     private boolean sprawdzCacheMerkatora() {
-        if(Arrays.asList(MainActivity.activity.fileList()).contains(Stale.SUFFIXCACHEMERKATOR)) {
+        if(listaplikowaplikacji.contains(Stale.SUFFIXCACHEMERKATOR)) {
             return true;
         } else {
             return false;
