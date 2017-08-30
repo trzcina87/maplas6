@@ -136,9 +136,10 @@ public class RysujWatek extends Thread {
             if(ilosckafliwgore <= 0) {
                 ilosckafliwgore = 1;
             }
-            int dodatkowykafel = 1;
-            for(int i = -ilosckafliwlewo; i <= ilosckafliwlewo + dodatkowykafel; i++) {
-                for(int j = -ilosckafliwgore; j <= ilosckafliwgore + dodatkowykafel; j++) {
+            int dodatkowykafelx = 1;
+            int dodatkowykafely = 1;
+            for(int i = -ilosckafliwlewo; i <= ilosckafliwlewo + dodatkowykafelx; i++) {
+                for(int j = -ilosckafliwgore; j <= ilosckafliwgore + dodatkowykafely; j++) {
                     if(AppService.service.wczytajwatek.czyBitmapaWczytana(centralnykafel.x + i, centralnykafel.y + j)) {
                         Bitmap kafel = AppService.service.wczytajwatek.bitmapy[centralnykafel.x + i][centralnykafel.y + j];
                         int rozmiarxpozoom = (int) (zoom * kafel.getWidth());

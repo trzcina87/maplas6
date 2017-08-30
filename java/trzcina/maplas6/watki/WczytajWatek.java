@@ -37,6 +37,7 @@ public class WczytajWatek extends Thread {
     public int nasycenie;
     public int kontrast;
     public int[] kontrasttablica;
+    public Paint paintnasycenie;
 
     public WczytajWatek() {
         zakoncz = false;
@@ -51,6 +52,7 @@ public class WczytajWatek extends Thread {
         odswiez = false;
         ostatnicentralnykafel = new Point(-1000000, -1000000);
         kontrasttablica = new int[256];
+        paintnasycenie = null;
         for(int i = 0; i < 256; i++) {
             kontrasttablica[i] = 1;
         }
@@ -100,8 +102,25 @@ public class WczytajWatek extends Thread {
                 kontrasttmp[i] = (int)(((((i / 255.0) - 0.5) * contrastVal2) + 0.5) * 255.0);
                 kontrasttmp[i] = truncate(kontrasttmp[i]);
             }
-            kontrasttablica = kontrasttmp;
-
+            for(int i = 128; i <= 255; i++) {
+                kontrasttablica[i] = kontrasttmp[i - 128];
+                if(kontrasttablica[i] >= 128) {
+                    kontrasttablica[i] = -256 + kontrasttablica[i];
+                }
+            }
+            for(int i = 0; i <= 127; i++) {
+                kontrasttablica[i] = kontrasttmp[128 + i];
+                if(kontrasttablica[i] >= 128) {
+                    kontrasttablica[i] = -256 + kontrasttablica[i];
+                }
+            }
+        }
+        if(nasycenie != 0) {
+            ColorMatrix colorMatrix = new ColorMatrix();
+            colorMatrix.setSaturation((1.0F/11.0F) * nasycenie + 1);
+            ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+            paintnasycenie = new Paint();
+            paintnasycenie.setColorFilter(filter);
         }
     }
 
@@ -143,49 +162,20 @@ public class WczytajWatek extends Thread {
     }
 
     private Bitmap dodajKontrast(Bitmap bitmapa) {
-        /*Bitmap bit0 = BitmapFactory.decodeResource(MainActivity.activity.getResources(), R.mipmap.b140);
-        Log.e("BUF", String.valueOf(bit0.getRowBytes() * bit0.getHeight()));
-        ByteBuffer bufor0 = ByteBuffer.allocate(bit0.getRowBytes() * bit0.getHeight());
-        bit0.copyPixelsToBuffer(bufor0);
-        byte[] buf0 = bufor0.array();
-        for(int i = 0; i < buf0.length; i++) {
-            Log.e("BUF", String.valueOf(buf0[i]));
-        }*/
-        ByteBuffer bufor = ByteBuffer.allocateDirect(bitmapa.getRowBytes() * bitmapa.getHeight());
+        ByteBuffer bufor = ByteBuffer.allocate(bitmapa.getRowBytes() * bitmapa.getHeight());
         bitmapa.copyPixelsToBuffer(bufor);
         byte[] buf = bufor.array();
         for(int i = 0; i < buf.length; i++) {
-            if(buf[i] >= 0) {
-                int nowawartosc = (kontrasttablica[(int) buf[i]]);
-                if(nowawartosc >= 128) {
-                    buf[i] = (byte) (-128 + (nowawartosc - 128));
-                } else {
-                    buf[i] = (byte)nowawartosc;
-                }
-            } else {
-                int nowypixel = 255 + buf[i];
-                int nowawartosc = (kontrasttablica[nowypixel]);
-                if(nowawartosc >= 128) {
-                    buf[i] = (byte) (-128 + (nowawartosc - 128));
-                } else {
-                    buf[i] = (byte)nowawartosc;
-                }
-            }
+            buf[i] = (byte) kontrasttablica[buf[i] + 128];
         }
-        Bitmap nowa = Bitmap.createBitmap(bitmapa.getWidth(), bitmapa.getHeight(), bitmapa.getConfig());
-        nowa.copyPixelsFromBuffer(ByteBuffer.wrap(buf));
-        nowa.setHasAlpha(false);
-        return nowa;
+        bitmapa.copyPixelsFromBuffer(ByteBuffer.wrap(buf));
+        bitmapa.setHasAlpha(false);
+        return bitmapa;
     }
 
     private Bitmap dodajNasycenie(Bitmap bitmapa) {
-        ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation((1.0F/11.0F) * nasycenie + 1);
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-        Paint paint = new Paint();
-        paint.setColorFilter(filter);
         Bitmap bitmapatmp = Bitmap.createBitmap(bitmapa.getWidth(), bitmapa.getHeight(), Bitmap.Config.ARGB_8888);
-        new Canvas(bitmapatmp).drawBitmap(bitmapa, 0, 0, paint);
+        new Canvas(bitmapatmp).drawBitmap(bitmapa, 0, 0, paintnasycenie);
         return bitmapatmp;
     }
 
