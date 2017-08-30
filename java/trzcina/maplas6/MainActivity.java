@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     public EditText uploadurl;
     public LinearLayout spismap;
     public LinearLayout spisplikow;
+    public LinearLayout layoutzgpstextview;
     public Button opcjeanuluj;
     public Button opcjezapisz;
     private TextView textinfoprzygotowanie;
@@ -221,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
         nasycenieseekbar = (SeekBar) opcjepodstawowelayout.findViewById(R.id.nasycenieseekbar);
         wyslijurl = (EditText)opcjezaawansowanelayout.findViewById(R.id.wyslijurl);
         imageviewinternet = (ImageView)maplayout.findViewById(R.id.imageviewinternet);
+        layoutzgpstextview = (LinearLayout)maplayout.findViewById(R.id.layoutzgpstextview);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -607,6 +609,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         gpstextview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AppService.service.zmienKolorInfo();
+                zmienStylTextView();
+            }
+        });
+        layoutzgpstextview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AppService.service.zmienKolorInfo();

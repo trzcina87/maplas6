@@ -129,19 +129,26 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:textColor="@android:color/white"
-        android:paddingTop="24dp"
+        android:layout_marginTop="24dp"
         android:text="" />
 
-    <TextView
-        android:id="@+id/gpstextview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/layoutzgpstextview"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:textColor="@android:color/white"
-        android:paddingTop="24dp"
+        android:layout_width="wrap_content"
         android:paddingBottom="24dp"
-        android:text="" />
+        android:paddingTop="27dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/gpstextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:text="" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/statuszoom"
@@ -150,7 +157,7 @@
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/statussatelity"
         android:textColor="@android:color/white"
-        android:paddingTop="24dp"
+        android:layout_marginTop="24dp"
         android:text="" />
 
     <ImageView
@@ -169,7 +176,7 @@
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/imageviewsatelita"
         android:textColor="@android:color/white"
-        android:paddingTop="24dp"
+        android:layout_marginTop="24dp"
         android:text="" />
 
     <ImageView
