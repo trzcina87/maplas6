@@ -402,7 +402,7 @@ public class AppService extends Service {
         Atlas nowyatlas = Atlasy.znajdzAtlasPoNazwie(Ustawienia.atlas.wartosc);
         int nasycenie = Ustawienia.nasycenie.wartosc;
         int kontrast = Ustawienia.kontrast.wartosc;
-        if((nowyatlas != atlas) || (nowyatlas == null) || (nasycenie != wczytajwatek.nasycenie) || (kontrast != wczytajwatek.kontrast)) {
+        if((nowyatlas != atlas) || (nowyatlas == null)) {
             atlas = nowyatlas;
             if (atlas != null) {
                 tmiparser = atlas.parserytmi.get(atlas.parserytmi.size() - 1);
@@ -413,6 +413,10 @@ public class AppService extends Service {
                 }
             }
             zoom = 10;
+            wczytajwatek.przeladujkonfiguracje = true;
+            rysujwatek.przeladujkonfiguracje = true;
+        }
+        if((nasycenie != wczytajwatek.nasycenie) || (kontrast != wczytajwatek.kontrast)) {
             wczytajwatek.przeladujkonfiguracje = true;
             rysujwatek.przeladujkonfiguracje = true;
         }
