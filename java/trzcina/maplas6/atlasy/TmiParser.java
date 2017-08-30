@@ -236,9 +236,9 @@ public class TmiParser {
         }
         if((poprzednix != -1) && (poprzedniy != -1)) {
             if ((poprzednix == -2) && (poprzedniy == -2)) {
-                mapdlugosc = mapstart + 1000;
+                mapdlugosc = 10000;
             } else {
-                dlugosckafla[poprzednix / rozmiarkafla.x][poprzedniy / rozmiarkafla.y] = startkafla[poprzednix / rozmiarkafla.x][poprzedniy / rozmiarkafla.y] + 1000;
+                dlugosckafla[poprzednix / rozmiarkafla.x][poprzedniy / rozmiarkafla.y] = 10000;
             }
         }
     }
