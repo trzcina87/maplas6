@@ -40,6 +40,7 @@ public class Stale {
     //Obsluga HTTP
     public static String DOWNLOADURL = "http://trzcina.d2.pl/puszcza/gpx2016/download.php";
     public static String UPLOADURL = "http://trzcina.d2.pl/puszcza/gpx2016/upload.php";
+    public static String SENDURL = "http://trzcina.d2.pl/maplas/add.php";
     public static String DOWNLOADUSER = "readonly";
     public static String DOWNLOADPASS = "ReadOnly2017gpx";
 

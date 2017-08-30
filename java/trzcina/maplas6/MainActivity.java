@@ -98,10 +98,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView szybkipunktimageview;
     public TextView statuszoom;
     public MainSurface surface;
+    public EditText wyslijurl;
     public TextView kontrasttextview;
     public SeekBar kontrastseekbar;
     public TextView nasycenietextview;
     public SeekBar nasycenieseekbar;
+    public ImageView imageviewinternet;
 
     //PokazPliki
     private Button pokazplikianuluj;
@@ -217,6 +219,8 @@ public class MainActivity extends AppCompatActivity {
         kontrastseekbar = (SeekBar)opcjepodstawowelayout.findViewById(R.id.kontrastseekbar);
         nasycenietextview = (TextView)opcjepodstawowelayout.findViewById(R.id.nasycenietextview);
         nasycenieseekbar = (SeekBar) opcjepodstawowelayout.findViewById(R.id.nasycenieseekbar);
+        wyslijurl = (EditText)opcjezaawansowanelayout.findViewById(R.id.wyslijurl);
+        imageviewinternet = (ImageView)maplayout.findViewById(R.id.imageviewinternet);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -738,6 +742,14 @@ public class MainActivity extends AppCompatActivity {
         ustawImageView(satelitaimageview, R.mipmap.satelitaczerwony);
     }
 
+    public void ustawInternetOK() {
+        ustawImageView(imageviewinternet, R.mipmap.internetok);
+    }
+
+    public void ustawInternetFail() {
+        ustawImageView(imageviewinternet, R.mipmap.internetfail);
+    }
+
     //Konfigruje Menu glowne programu
     private void utworzMenu() {
         final PopupMenu menuglowne = new PopupMenu(MainActivity.this, menuimageview);
@@ -751,6 +763,7 @@ public class MainActivity extends AppCompatActivity {
                 menuglowne.getMenu().findItem(R.id.precyzjagps).setChecked(AppService.service.precyzyjnygps);
                 menuglowne.getMenu().findItem(R.id.dzwiekiitem).setChecked(AppService.service.grajdzwieki);
                 menuglowne.getMenu().findItem(R.id.trybsamochodowyitem).setChecked(AppService.service.trybsamochodowy);
+                menuglowne.getMenu().findItem(R.id.internetitem).setChecked(AppService.service.internetwyslij);
                 menuglowne.show();
             }
         });

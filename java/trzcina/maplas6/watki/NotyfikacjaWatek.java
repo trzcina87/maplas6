@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import trzcina.maplas6.AppService;
+import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.R;
 import trzcina.maplas6.lokalizacja.GPXTrasaLogger;
 import trzcina.maplas6.pomoc.Rozne;
@@ -28,6 +29,22 @@ public class NotyfikacjaWatek extends Thread {
 
     }
 
+    private void ustawIkoneInternetu() {
+        if(AppService.service.wlaczgps == false) {
+            AppService.service.notyfikacjaUstawIkoneInternet(R.mipmap.internetok);
+        } else {
+            if(AppService.service.internetwyslij == true) {
+                if (System.currentTimeMillis() >= AppService.service.internetwyslijwatek.ostatniawysylka + 150 * 1000) {
+                    AppService.service.notyfikacjaUstawIkoneInternet(R.mipmap.internetfail);
+                } else {
+                    AppService.service.notyfikacjaUstawIkoneInternet(R.mipmap.internetok);
+                }
+            } else {
+                AppService.service.notyfikacjaUstawIkoneInternet(R.mipmap.internetfail);
+            }
+        }
+    }
+
     public void run() {
         AppService.service.utworzNotyfikacje(numernotyfikacji);
         while (zakoncz == false) {
@@ -36,6 +53,7 @@ public class NotyfikacjaWatek extends Thread {
             AppService.service.notyfikacjaUstawSatelity("");
             AppService.service.notyfikacjaUstawStanGPS("");
             AppService.service.notyfikacjaUstawIkoneGPS(R.mipmap.satelitaczerwony);
+            ustawIkoneInternetu();
             if (AppService.service.wlaczgps) {
                 Location lokalizacja = AppService.service.czyJestFix();
                 if (lokalizacja != null) {
@@ -60,7 +78,7 @@ public class NotyfikacjaWatek extends Thread {
             }
             AppService.service.notyfikacjaZatwierdz(numernotyfikacji);
             iloscupdate = iloscupdate + 1;
-            if(iloscupdate >= 900) {
+            if(iloscupdate >= 600) {
                 AppService.service.notificationmanager.cancel(numernotyfikacji);
                 AppService.service.unregisterReceiver(AppService.service.odbiorznotyfikacji);
                 numernotyfikacji = numernotyfikacji + 1;

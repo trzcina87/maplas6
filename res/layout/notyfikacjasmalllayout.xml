@@ -52,7 +52,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@mipmap/internetfail"
+                    app:srcCompat="@mipmap/internetok"
                     android:id="@+id/internetimageviewsmall"
                     android:layout_weight="1" />
 

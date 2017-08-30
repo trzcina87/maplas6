@@ -1,7 +1,5 @@
 package trzcina.maplas6.lokalizacja;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -20,7 +18,7 @@ public class GPXTrasaLogger {
     private PrintWriter printwriter;
     public String nazwapliku;
     public PunktWTrasie[] lista;
-    public int dlugosc;
+    public int iloscpunktow;
     public float dlugosctrasy;
     public float odlegloscodpoczatku;
     public long czasstart;
@@ -68,7 +66,7 @@ public class GPXTrasaLogger {
         nazwapliku = null;
         nazwaplikdata = null;
         lista = new PunktWTrasie[50000];
-        dlugosc = 0;
+        iloscpunktow = 0;
         dlugosctrasy = 0;
         odlegloscodpoczatku = 0;
         utworzNazwe();
@@ -90,12 +88,12 @@ public class GPXTrasaLogger {
             printwriter.println("        <desc>" + "dokladnosc:" + dok + "</desc>");
             printwriter.println("      </trkpt>");
             printwriter.flush();
-            lista[dlugosc] = new PunktWTrasie(wspx, wspy);
-            dlugosc = dlugosc + 1;
-            if(dlugosc > 1) {
-                dlugosctrasy = dlugosctrasy + PunktWTrasie.zmierzDystans(lista[dlugosc-1], lista[dlugosc-2]);
+            lista[iloscpunktow] = new PunktWTrasie(wspx, wspy);
+            iloscpunktow = iloscpunktow + 1;
+            if(iloscpunktow > 1) {
+                dlugosctrasy = dlugosctrasy + PunktWTrasie.zmierzDystans(lista[iloscpunktow -1], lista[iloscpunktow -2]);
             }
-            odlegloscodpoczatku = PunktWTrasie.zmierzDystans(lista[dlugosc - 1], lista[0]);
+            odlegloscodpoczatku = PunktWTrasie.zmierzDystans(lista[iloscpunktow - 1], lista[0]);
             return true;
         } catch (Exception e) {
             return false;

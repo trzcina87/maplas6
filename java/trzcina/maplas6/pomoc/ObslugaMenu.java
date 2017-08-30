@@ -51,7 +51,7 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
                 return true;
 
             case R.id.internetitem:
-                MainActivity.activity.pokazToast("Nie zaimplementowane!");
+                AppService.service.internetwyslij = ! AppService.service.internetwyslij;
                 return true;
 
             case R.id.precyzjagps:

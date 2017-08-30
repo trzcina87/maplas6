@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.location.Location;
-import android.util.Log;
 
 import java.util.List;
 
@@ -26,7 +25,6 @@ import trzcina.maplas6.pomoc.Painty;
 import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
 
-import static android.content.Context.APP_OPS_SERVICE;
 import static trzcina.maplas6.MainActivity.activity;
 
 @SuppressWarnings("PointlessBooleanExpression")
@@ -191,7 +189,7 @@ public class RysujWatek extends Thread {
         float promienpunktu = 4 * Painty.density;
         GPXTrasaLogger obecnatrasa = AppService.service.obecnatrasa;
         if(obecnatrasa != null) {
-            int dlugosc = obecnatrasa.dlugosc;
+            int dlugosc = obecnatrasa.iloscpunktow;
             int popy = 0;
             int popx = 0;
             PunktWTrasie poprzedni = null;

@@ -16,6 +16,7 @@ public class Ustawienia {
     public static UstawienieString downloaduser;
     public static UstawienieString downloadpass;
     public static UstawienieString uploadurl;
+    public static UstawienieString wyslijurl;
     public static UstawienieIntSeekBar kontrast;
     public static UstawienieIntSeekBar nasycenie;
 
@@ -32,6 +33,7 @@ public class Ustawienia {
         downloadpass = new UstawienieString(Stale.DOWNLOADPASS, null, "downloadpass", MainActivity.activity.downloadpass);
         downloaduser = new UstawienieString(Stale.DOWNLOADUSER, null, "downloaduser", MainActivity.activity.downloaduser);
         uploadurl = new UstawienieString(Stale.UPLOADURL, null, "uploadurl", MainActivity.activity.uploadurl);
+        wyslijurl = new UstawienieString(Stale.SENDURL, null, "wyslijurl", MainActivity.activity.wyslijurl);
         kontrast = new UstawienieIntSeekBar(0, 0, "kontrast", MainActivity.activity.kontrasttextview, MainActivity.activity.kontrastseekbar, 0, 20, 1, true);
         nasycenie = new UstawienieIntSeekBar(0, 0, "nasycenie", MainActivity.activity.nasycenietextview, MainActivity.activity.nasycenieseekbar, 0, 20, 1, true);
         ustawienia.add(nazwaurzadzenia);
@@ -41,6 +43,7 @@ public class Ustawienia {
         ustawienia.add(downloadurl);
         ustawienia.add(downloaduser);
         ustawienia.add(uploadurl);
+        ustawienia.add(wyslijurl);
         ustawienia.add(kontrast);
         ustawienia.add(nasycenie);
     }

@@ -197,7 +197,7 @@ public class TmiParser {
         }
     }
 
-    //Wyznaczymy start i dlugosc kazdego pliku graficznego i pliku MAP
+    //Wyznaczymy start i iloscpunktow kazdego pliku graficznego i pliku MAP
     private void drugiPrzebieg() throws IOException {
         BufferedReader bufferedreader = otworzPlik();
         String przetwarzanalinia = bufferedreader.readLine();

@@ -58,6 +58,7 @@ import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.ustawienia.Ustawienia;
 import trzcina.maplas6.watki.DzwiekiWatek;
+import trzcina.maplas6.watki.InternetWyslijWatek;
 import trzcina.maplas6.watki.KompasWatek;
 import trzcina.maplas6.watki.LuxWatek;
 import trzcina.maplas6.watki.NotyfikacjaWatek;
@@ -94,12 +95,14 @@ public class AppService extends Service {
     public Looper loopergps;
     public DzwiekiWatek dzwiekiwatek;
     public NotyfikacjaWatek notyfikacjawatek;
+    public InternetWyslijWatek internetwyslijwatek;
 
     public volatile boolean przelaczajpogps;
     public volatile boolean wlaczgps;
     public volatile boolean precyzyjnygps;
     public volatile boolean grajdzwieki;
     public volatile boolean trybsamochodowy;
+    public volatile boolean internetwyslij;
 
     //Notyfikcja
     public volatile RemoteViews widokmalejnotyfikacji;
@@ -123,6 +126,8 @@ public class AppService extends Service {
         loopergps = null;
         dzwiekiwatek = null;
         notyfikacjawatek = null;
+        internetwyslijwatek = null;
+
     }
 
     //Konstruktor
@@ -145,6 +150,7 @@ public class AppService extends Service {
         trybsamochodowy = false;
         gpszarejestrowany = false;
         przesuwajmapezgps = false;
+        internetwyslij = false;
         poziominfo = Stale.OPISYPUNKTY;
         widokmalejnotyfikacji = null;
         notificationmanager = null;
@@ -268,12 +274,14 @@ public class AppService extends Service {
         wczytajwatek = new WczytajWatek();
         dzwiekiwatek = new DzwiekiWatek();
         notyfikacjawatek = new NotyfikacjaWatek();
+        internetwyslijwatek = new InternetWyslijWatek();
         luxwatek.start();
         rysujwatek.start();
         kompaswatek.start();
         wczytajwatek.start();
         dzwiekiwatek.start();
         notyfikacjawatek.start();
+        internetwyslijwatek.start();
         wystartujWatekGPS();
     }
 
@@ -524,6 +532,22 @@ public class AppService extends Service {
         }
     }
 
+    private void odswiezUIIkonaInternet() {
+        if(wlaczgps == false) {
+            MainActivity.activity.ustawInternetOK();
+        } else {
+            if(internetwyslij == true) {
+                if (System.currentTimeMillis() >= internetwyslijwatek.ostatniawysylka + 150 * 1000) {
+                    MainActivity.activity.ustawInternetFail();
+                } else {
+                    MainActivity.activity.ustawInternetOK();
+                }
+            } else {
+                MainActivity.activity.ustawInternetFail();
+            }
+        }
+    }
+
     public void odswiezUIZoom() {
         if(zoom == 10) {
             MainActivity.activity.ustawStatusZoom("");
@@ -538,6 +562,7 @@ public class AppService extends Service {
             odswiezUISatelity();
             odswiezUIIkonaSatelity();
             odswiezUIZoom();
+            odswiezUIIkonaInternet();
         }
     }
 
@@ -635,6 +660,14 @@ public class AppService extends Service {
     public void notyfikacjaUstawIkoneGPS(final int zasob) {
         try {
             widokmalejnotyfikacji.setImageViewResource(R.id.notyfikacjaikonasatelity, zasob);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void notyfikacjaUstawIkoneInternet(final int zasob) {
+        try {
+            widokmalejnotyfikacji.setImageViewResource(R.id.internetimageviewsmall, zasob);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -920,6 +953,14 @@ public class AppService extends Service {
         }
     }
 
+    //Konczymy watek internet wyslij
+    private void zakonczInternetWyslijWatek() {
+        if(internetwyslijwatek != null) {
+            internetwyslijwatek.zakoncz = true;
+            zakonczWatek(internetwyslijwatek);
+        }
+    }
+
     private void zakonczWatekGPS() {
         if(gpswatek != null) {
             gpswatek.quit();
@@ -940,6 +981,7 @@ public class AppService extends Service {
         zakonczWatekWczytaj();
         zakonczWatekDzwieki();
         zakonczNotyfikacjaWatek();
+        zakonczInternetWyslijWatek();
         zakonczWatekGPS();
     }
 
