@@ -8,7 +8,7 @@ import android.widget.EditText;
 import trzcina.maplas6.MainActivity;
 
 @SuppressWarnings("PointlessBooleanExpression")
-public class UstawienieString {
+public class UstawienieString implements Ustawienie {
 
     public String wartoscdomyslna;      //Wartosc domyslna konfiguracji
     public String wartosc;              //Wartosc obecna konfiguracji

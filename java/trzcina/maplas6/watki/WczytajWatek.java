@@ -2,16 +2,25 @@ package trzcina.maplas6.watki;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 import trzcina.maplas6.AppService;
 import trzcina.maplas6.MainActivity;
+import trzcina.maplas6.R;
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.TmiParser;
 import trzcina.maplas6.pomoc.Rozne;
+import trzcina.maplas6.ustawienia.Ustawienia;
 
 @SuppressWarnings("PointlessBooleanExpression")
 public class WczytajWatek extends Thread {
@@ -25,6 +34,9 @@ public class WczytajWatek extends Thread {
     private int ilosckafli;
     private Point ostatnicentralnykafel;
     public volatile boolean odswiez;
+    public int nasycenie;
+    public int kontrast;
+    public int[] kontrasttablica;
 
     public WczytajWatek() {
         zakoncz = false;
@@ -34,8 +46,14 @@ public class WczytajWatek extends Thread {
         tmiparser = null;
         pliktar = null;
         ilosckafli = 0;
+        nasycenie = 0;
+        kontrast = 0;
         odswiez = false;
         ostatnicentralnykafel = new Point(-1000000, -1000000);
+        kontrasttablica = new int[256];
+        for(int i = 0; i < 256; i++) {
+            kontrasttablica[i] = 1;
+        }
     }
 
     private void zamknijPlik() {
@@ -57,6 +75,8 @@ public class WczytajWatek extends Thread {
         ilosckafli = 0;
         ostatnicentralnykafel.set(-1000000, -1000000);
         odswiez = false;
+        nasycenie = Ustawienia.nasycenie.wartosc;
+        kontrast = Ustawienia.kontrast.wartosc;
         zamknijPlik();
         if(atlas != null) {
             try {
@@ -72,6 +92,26 @@ public class WczytajWatek extends Thread {
                 e.printStackTrace();
             }
         }
+        if(kontrast != 0) {
+            int kontrasttmp[] = new int[256];
+            double contrastVal = kontrast * 2;
+            double contrastVal2 = Math.pow((100 + contrastVal) / 100f, 2);
+            for(int i = 0; i < 256; i++) {
+                kontrasttmp[i] = (int)(((((i / 255.0) - 0.5) * contrastVal2) + 0.5) * 255.0);
+                kontrasttmp[i] = truncate(kontrasttmp[i]);
+            }
+            kontrasttablica = kontrasttmp;
+
+        }
+    }
+
+    private int truncate(int value) {
+        if (value < 0) {
+            return 0;
+        } else if (value > 255) {
+            return 255;
+        }
+        return value;
     }
 
     public boolean czyBitmapaWczytana(Point wspolrzedne) {
@@ -102,6 +142,53 @@ public class WczytajWatek extends Thread {
         }
     }
 
+    private Bitmap dodajKontrast(Bitmap bitmapa) {
+        /*Bitmap bit0 = BitmapFactory.decodeResource(MainActivity.activity.getResources(), R.mipmap.b140);
+        Log.e("BUF", String.valueOf(bit0.getRowBytes() * bit0.getHeight()));
+        ByteBuffer bufor0 = ByteBuffer.allocate(bit0.getRowBytes() * bit0.getHeight());
+        bit0.copyPixelsToBuffer(bufor0);
+        byte[] buf0 = bufor0.array();
+        for(int i = 0; i < buf0.length; i++) {
+            Log.e("BUF", String.valueOf(buf0[i]));
+        }*/
+        ByteBuffer bufor = ByteBuffer.allocateDirect(bitmapa.getRowBytes() * bitmapa.getHeight());
+        bitmapa.copyPixelsToBuffer(bufor);
+        byte[] buf = bufor.array();
+        for(int i = 0; i < buf.length; i++) {
+            if(buf[i] >= 0) {
+                int nowawartosc = (kontrasttablica[(int) buf[i]]);
+                if(nowawartosc >= 128) {
+                    buf[i] = (byte) (-128 + (nowawartosc - 128));
+                } else {
+                    buf[i] = (byte)nowawartosc;
+                }
+            } else {
+                int nowypixel = 255 + buf[i];
+                int nowawartosc = (kontrasttablica[nowypixel]);
+                if(nowawartosc >= 128) {
+                    buf[i] = (byte) (-128 + (nowawartosc - 128));
+                } else {
+                    buf[i] = (byte)nowawartosc;
+                }
+            }
+        }
+        Bitmap nowa = Bitmap.createBitmap(bitmapa.getWidth(), bitmapa.getHeight(), bitmapa.getConfig());
+        nowa.copyPixelsFromBuffer(ByteBuffer.wrap(buf));
+        nowa.setHasAlpha(false);
+        return nowa;
+    }
+
+    private Bitmap dodajNasycenie(Bitmap bitmapa) {
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation((1.0F/11.0F) * nasycenie + 1);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+        Paint paint = new Paint();
+        paint.setColorFilter(filter);
+        Bitmap bitmapatmp = Bitmap.createBitmap(bitmapa.getWidth(), bitmapa.getHeight(), Bitmap.Config.ARGB_8888);
+        new Canvas(bitmapatmp).drawBitmap(bitmapa, 0, 0, paint);
+        return bitmapatmp;
+    }
+
     private void wczytajBitmape(Point wspolrzedne) {
         if ((wspolrzedne.x < 0) || (wspolrzedne.x >= tmiparser.ilosckafli.x)) {
             return;
@@ -114,6 +201,12 @@ public class WczytajWatek extends Thread {
             int dlugoscwtar = tmiparser.dlugosckafla[wspolrzedne.x][wspolrzedne.y] * 512;
             byte[] bajtyplikugraficznego = Rozne.odczytajPlikRAM(pliktar, startwtar, dlugoscwtar);
             bitmapy[wspolrzedne.x][wspolrzedne.y] = BitmapFactory.decodeByteArray(bajtyplikugraficznego, 0, bajtyplikugraficznego.length);
+            if(kontrast != 0) {
+                bitmapy[wspolrzedne.x][wspolrzedne.y] = dodajKontrast(bitmapy[wspolrzedne.x][wspolrzedne.y]);
+            }
+            if(nasycenie != 0) {
+                bitmapy[wspolrzedne.x][wspolrzedne.y] = dodajNasycenie(bitmapy[wspolrzedne.x][wspolrzedne.y]);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,6 +224,12 @@ public class WczytajWatek extends Thread {
             int dlugoscwtar = tmiparser.dlugosckafla[x][y] * 512;
             byte[] bajtyplikugraficznego = Rozne.odczytajPlikRAM(pliktar, startwtar, dlugoscwtar);
             bitmapy[x][y] = BitmapFactory.decodeByteArray(bajtyplikugraficznego, 0, bajtyplikugraficznego.length);
+            if(kontrast != 0) {
+                bitmapy[x][y] = dodajKontrast(bitmapy[x][y]);
+            }
+            if(nasycenie != 0) {
+                bitmapy[x][y] = dodajNasycenie(bitmapy[x][y]);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

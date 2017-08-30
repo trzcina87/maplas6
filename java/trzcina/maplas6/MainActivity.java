@@ -16,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView szybkipunktimageview;
     public TextView statuszoom;
     public MainSurface surface;
+    public TextView kontrasttextview;
+    public SeekBar kontrastseekbar;
+    public TextView nasycenietextview;
+    public SeekBar nasycenieseekbar;
 
     //PokazPliki
     private Button pokazplikianuluj;
@@ -209,6 +213,10 @@ public class MainActivity extends AppCompatActivity {
         ustawieniadomyslne = (Button)opcjezaawansowanelayout.findViewById(R.id.ustawieniadomyslne);
         szybkipunktimageview = (ImageView)maplayout.findViewById(R.id.szybkipunkt);
         statuszoom = (TextView)maplayout.findViewById(R.id.statuszoom);
+        kontrasttextview = (TextView)opcjepodstawowelayout.findViewById(R.id.kontrasttextview);
+        kontrastseekbar = (SeekBar)opcjepodstawowelayout.findViewById(R.id.kontrastseekbar);
+        nasycenietextview = (TextView)opcjepodstawowelayout.findViewById(R.id.nasycenietextview);
+        nasycenieseekbar = (SeekBar) opcjepodstawowelayout.findViewById(R.id.nasycenieseekbar);
     }
 
     //Czysci wszystkie widoki z spisie map tak by byl pusty
@@ -230,6 +238,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 atlasedittext.setText((String)view.getTag());
+                zamknijOpcjeIWrocDoMapy();
+                Ustawienia.zapiszDoUstawien();
+                AppService.service.zaczytajOpcje(false, 0, 0);
             }
         });
         spismap.addView(button);
@@ -391,10 +402,6 @@ public class MainActivity extends AppCompatActivity {
         if(ilezaznaczonych == 0) {
             MainActivity.activity.pokazToast("Zaznacz pliki do wysłania!");
         }
-    }
-
-    public void ustawieniaDomyslne() {
-
     }
 
     public void wyczyscCache() {

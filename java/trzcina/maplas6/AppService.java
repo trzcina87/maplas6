@@ -400,7 +400,9 @@ public class AppService extends Service {
 
     public void zaczytajOpcje(boolean zachowajwspolrzene, float gpsx, float gpsy) {
         Atlas nowyatlas = Atlasy.znajdzAtlasPoNazwie(Ustawienia.atlas.wartosc);
-        if((nowyatlas != atlas) || (nowyatlas == null)) {
+        int nasycenie = Ustawienia.nasycenie.wartosc;
+        int kontrast = Ustawienia.kontrast.wartosc;
+        if((nowyatlas != atlas) || (nowyatlas == null) || (nasycenie != wczytajwatek.nasycenie) || (kontrast != wczytajwatek.kontrast)) {
             atlas = nowyatlas;
             if (atlas != null) {
                 tmiparser = atlas.parserytmi.get(atlas.parserytmi.size() - 1);
