@@ -140,6 +140,7 @@
         android:layout_alignParentTop="true"
         android:textColor="@android:color/white"
         android:paddingTop="24dp"
+        android:paddingBottom="24dp"
         android:text="" />
 
     <TextView

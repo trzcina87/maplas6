@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.location.Location;
+import android.util.Log;
 
 import java.util.List;
 
@@ -227,14 +228,41 @@ public class RysujWatek extends Thread {
                 }
                 canvas.drawText(punkt.nazwa, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8, Painty.painttekst[AppService.service.kolorinfo]);
             }
-            if(AppService.service.poziominfo >= Stale.OPISYKOMENTARZE) {
+            if((AppService.service.poziominfo == Stale.OPISYKOMENTARZE) || (AppService.service.poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE)) {
                 if(punkt.opis != null) {
                     Rect zarys = new Rect();
                     Painty.painttekst[AppService.service.kolorinfo].getTextBounds(punkt.opis, 0, punkt.opis.length(), zarys);
                     if(AppService.service.kolorinfo == 3) {
-                        rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x  + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                        rysujProstokat(canvas, (AppService.service.srodekekranu.x  + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
                     }
                     canvas.drawText(punkt.opis, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - zarys.top, Painty.painttekst[AppService.service.kolorinfo]);
+                }
+            }
+            if((AppService.service.poziominfo == Stale.OPISYODLEGLOSCI) || (AppService.service.poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE)) {
+                Location gps = AppService.service.czyJestFix();
+                if(gps != null) {
+                    String dystans = Rozne.formatujDystans(Math.round(punkt.zmierzDystans(gps.getLongitude(), gps.getLatitude())));
+                    if (dystans != null) {
+                        Rect zarys = new Rect();
+                        Painty.painttekst[AppService.service.kolorinfo].getTextBounds(dystans, 0, dystans.length(), zarys);
+                        if (AppService.service.kolorinfo == 3) {
+                            rysujProstokat(canvas, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom + promienpunktu + 4, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - zarys.height() / 2 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                        }
+                        canvas.drawText(dystans, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom + promienpunktu + 7, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + zarys.height() / 2, Painty.painttekst[AppService.service.kolorinfo]);
+                    }
+                }
+                if(tmiparser != null) {
+                    float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnadsrodkiem.x));
+                    float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnadsrodkiem.y));
+                    String dystans = Rozne.formatujDystans(Math.round(punkt.zmierzDystans(gpsx, gpsy)));
+                    if(dystans != null) {
+                        Rect zarys = new Rect();
+                        Painty.painttekst[AppService.service.kolorinfo].getTextBounds(dystans, 0, dystans.length(), zarys);
+                        if(AppService.service.kolorinfo == 3) {
+                            rysujProstokat(canvas, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - promienpunktu - 10 - zarys.width(), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - zarys.height() / 2 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                        }
+                        canvas.drawText(dystans, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - promienpunktu - 7 - zarys.width(), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + zarys.height() / 2, Painty.painttekst[AppService.service.kolorinfo]);
+                    }
                 }
             }
         }

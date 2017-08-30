@@ -376,7 +376,7 @@ public class AppService extends Service {
     }
 
     public void zmienPoziomInfo() {
-        poziominfo = (poziominfo + 1) % 4;
+        poziominfo = (poziominfo + 1) % 6;
         if(poziominfo == Stale.OPISYBRAK) {
             MainActivity.activity.pokazToast("Brak punktow");
         }
@@ -388,6 +388,12 @@ public class AppService extends Service {
         }
         if(poziominfo == Stale.OPISYKOMENTARZE) {
             MainActivity.activity.pokazToast("Punkty nazwy i opisy");
+        }
+        if(poziominfo == Stale.OPISYODLEGLOSCI) {
+            MainActivity.activity.pokazToast("Punkty nazwy i odległości");
+        }
+        if(poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE) {
+            MainActivity.activity.pokazToast("Punkty nazwy opisy i odległości");
         }
         if(poziominfo == Stale.OPISYBRAK) {
             MainActivity.activity.pokazIkoneOpisowWylaczonych();

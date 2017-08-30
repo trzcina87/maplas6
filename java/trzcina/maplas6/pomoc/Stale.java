@@ -49,6 +49,8 @@ public class Stale {
     public static int OPISYPUNKTY = 1;
     public static int OPISYNAZWY = 2;
     public static int OPISYKOMENTARZE = 3;
+    public static int OPISYODLEGLOSCI = 4;
+    public static int OPISYODLEGLOSCIKOMENTARZE = 5;
 
     public static int GPSREGISTERCZAS = 1000;
     public static int GPSREGISTERMETRYPIESZY = 10;
