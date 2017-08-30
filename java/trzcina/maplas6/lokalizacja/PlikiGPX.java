@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -39,10 +41,10 @@ public class PlikiGPX {
                     }
                 }
                 if((t1.getName().startsWith(nazwaurzadzenia)) && (! t2.getName().startsWith(nazwaurzadzenia))) {
-                    return 1;
+                    return -1;
                 }
                 if((! t1.getName().startsWith(nazwaurzadzenia)) && (t2.getName().startsWith(nazwaurzadzenia))) {
-                    return -1;
+                    return 1;
                 }
                 return 0;
             }
@@ -122,7 +124,7 @@ public class PlikiGPX {
             PlikGPX plikgpx = new PlikGPX(Stale.SCIEZKAMAPLAS + nazwa);
             plikgpx.parsuj();
             if(plikgpx.stan == Stale.PLIKGOTOWY) {
-                pliki.add(plikgpx);
+                pliki.add(0, plikgpx);
             }
         }
     }
@@ -133,7 +135,7 @@ public class PlikiGPX {
             plikgpx.parsuj();
             plikgpx.zaznaczony = true;
             if(plikgpx.stan == Stale.PLIKGOTOWY) {
-                pliki.add(plikgpx);
+                pliki.add(0, plikgpx);
             }
         }
     }

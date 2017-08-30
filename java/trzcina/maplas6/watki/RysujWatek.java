@@ -164,22 +164,30 @@ public class RysujWatek extends Thread {
             for (int i = 0; i < PlikiGPX.pliki.size(); i++) {
                 if (PlikiGPX.pliki.get(i).zaznaczony) {
                     List<PunktWTrasie> lista = PlikiGPX.pliki.get(i).trasa;
-                    int popy = 0;
-                    int popx = 0;
-                    PunktWTrasie poprzedni = null;
-                    for (int j = 0; j < lista.size(); j++) {
-                        PunktWTrasie punkt = lista.get(j);
+                    if(lista.size() > 0) {
+                        int popy = 0;
+                        int popx = 0;
+                        PunktWTrasie punkt = lista.get(0);
                         int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
                         int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
-                        if ((j == 0) || (j == lista.size() - 1)) {
-                            canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintzielonyokragtrasa);
-                        }
-                        if (poprzedni != null) {
-                            canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintzielonyokragtrasa);
-                        }
-                        popy = y;
+                        canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintzielonyokragtrasa);
                         popx = x;
-                        poprzedni = punkt;
+                        popy = y;
+                        for (int j = 1; j < lista.size() - 1; j++) {
+                            punkt = lista.get(j);
+                            x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
+                            y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
+                            if((Math.abs(x - popx) >= 3) || (Math.abs(y - popy) >= 3)) {
+                                canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintzielonyokragtrasa);
+                                popy = y;
+                                popx = x;
+                            }
+                        }
+                        punkt = lista.get(lista.size() - 1);
+                        x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
+                        y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
+                        canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintzielonyokragtrasa);
+                        canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintzielonyokragtrasa);
                     }
                 }
             }
@@ -190,23 +198,31 @@ public class RysujWatek extends Thread {
         float promienpunktu = 4 * Painty.density;
         GPXTrasaLogger obecnatrasa = AppService.service.obecnatrasa;
         if(obecnatrasa != null) {
-            int dlugosc = obecnatrasa.iloscpunktow;
-            int popy = 0;
-            int popx = 0;
-            PunktWTrasie poprzedni = null;
-            for (int j = 0; j < dlugosc; j++) {
-                PunktWTrasie punkt = obecnatrasa.lista[j];
+            int iloscpunktow = obecnatrasa.iloscpunktow;
+            if(iloscpunktow > 0) {
+                int popy = 0;
+                int popx = 0;
+                PunktWTrasie punkt = obecnatrasa.lista[0];
                 int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
                 int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
-                if ((j == 0) || (j == dlugosc - 1)) {
-                    canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintfioletowyokragtrasa);
-                }
-                if (poprzedni != null) {
-                    canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintfioletowyokragtrasa);
-                }
-                popy = y;
+                canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintfioletowyokragtrasa);
                 popx = x;
-                poprzedni = punkt;
+                popy = y;
+                for (int j = 1; j < iloscpunktow - 1; j++) {
+                    punkt = obecnatrasa.lista[j];
+                    x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
+                    y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
+                    if((Math.abs(x - popx) >= 3) || (Math.abs(y - popy) >= 3)) {
+                        canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintfioletowyokragtrasa);
+                        popy = y;
+                        popx = x;
+                    }
+                }
+                punkt = obecnatrasa.lista[iloscpunktow - 1];
+                x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
+                y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
+                canvas.drawLine(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, AppService.service.srodekekranu.x + (popx - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (popy - pixelnadsrodkiem.y) * zoom, Painty.paintfioletowyokragtrasa);
+                canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, Painty.paintfioletowyokragtrasa);
             }
         }
     }
@@ -215,74 +231,76 @@ public class RysujWatek extends Thread {
         canvas.drawRect(left, top, left + width, top + height, paint);
     }
 
-    private void rysujPunktNaMapie(PunktNaMapie punkt, Canvas canvas, Paint paint, Point pixelnadsrodkiem, float promienpunktu) {
+    private void rysujPunktNaMapie(PunktNaMapie punkt, Canvas canvas, Paint paint, Point pixelnadsrodkiem, float promienpunktu, Location lokalizacja) {
         int x = tmiparser.obliczPixelXDlaWspolrzednej(punkt.wspx);
         int y = tmiparser.obliczPixelYDlaWspolrzednej(punkt.wspy);
-        canvas.drawCircle(AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom, promienpunktu, paint);
-        if(AppService.service.poziominfo >= Stale.OPISYNAZWY) {
-            if(punkt.nazwa != null) {
-                Rect zarys = new Rect();
-                Painty.painttekst[AppService.service.kolorinfo].getTextBounds(punkt.nazwa, 0, punkt.nazwa.length(), zarys);
-                if(AppService.service.kolorinfo == 3) {
-                    rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x  + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8 - zarys.height() - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
-                }
-                canvas.drawText(punkt.nazwa, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8, Painty.painttekst[AppService.service.kolorinfo]);
-            }
-            if((AppService.service.poziominfo == Stale.OPISYKOMENTARZE) || (AppService.service.poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE)) {
-                if(punkt.opis != null) {
-                    Rect zarys = new Rect();
-                    Painty.painttekst[AppService.service.kolorinfo].getTextBounds(punkt.opis, 0, punkt.opis.length(), zarys);
-                    if(AppService.service.kolorinfo == 3) {
-                        rysujProstokat(canvas, (AppService.service.srodekekranu.x  + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+        float wspolrzednepunktunaekraniex = AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom;
+        float wspolrzednepunktunaekraniey = AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom;
+        int margines = 30;
+        if((wspolrzednepunktunaekraniex >= -margines) && (wspolrzednepunktunaekraniex <= AppService.service.srodekekranu.x * 2 + margines) && (wspolrzednepunktunaekraniey >= -margines) && (wspolrzednepunktunaekraniey <= AppService.service.srodekekranu.y * 2 + margines)) {
+            canvas.drawCircle(wspolrzednepunktunaekraniex, wspolrzednepunktunaekraniey, promienpunktu, paint);
+            if (AppService.service.poziominfo >= Stale.OPISYNAZWY) {
+                if (punkt.nazwa != null) {
+                    Rect zarys = punkt.rectnazwa;
+                    if (AppService.service.kolorinfo == 3) {
+                        rysujProstokat(canvas, (float) (AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8 - zarys.height() - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
                     }
-                    canvas.drawText(punkt.opis, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - zarys.top, Painty.painttekst[AppService.service.kolorinfo]);
+                    canvas.drawText(punkt.nazwa, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - promienpunktu - 8, Painty.painttekst[AppService.service.kolorinfo]);
                 }
-            }
-            if((AppService.service.poziominfo == Stale.OPISYODLEGLOSCI) || (AppService.service.poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE)) {
-                Location gps = AppService.service.czyJestFix();
-                if(gps != null) {
-                    String dystans = Rozne.formatujDystans(Math.round(punkt.zmierzDystans(gps.getLongitude(), gps.getLatitude())));
-                    if (dystans != null) {
-                        Rect zarys = new Rect();
-                        Painty.painttekst[AppService.service.kolorinfo].getTextBounds(dystans, 0, dystans.length(), zarys);
+                if ((AppService.service.poziominfo == Stale.OPISYKOMENTARZE) || (AppService.service.poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE)) {
+                    if (punkt.opis != null) {
+                        Rect zarys = punkt.rectopis;
                         if (AppService.service.kolorinfo == 3) {
-                            rysujProstokat(canvas, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom + promienpunktu + 4, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - zarys.height() / 2 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                            rysujProstokat(canvas, (AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2 - 3 + zarys.left), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
                         }
-                        canvas.drawText(dystans, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom + promienpunktu + 7, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + zarys.height() / 2, Painty.painttekst[AppService.service.kolorinfo]);
+                        canvas.drawText(punkt.opis, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - zarys.width() / 2, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + promienpunktu + 6 - zarys.top, Painty.painttekst[AppService.service.kolorinfo]);
                     }
                 }
-                if(tmiparser != null) {
-                    float gpsx = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaXDlaPixela(pixelnadsrodkiem.x));
-                    float gpsy = Rozne.zaokraglij5(tmiparser.obliczWspolrzednaYDlaPixela(pixelnadsrodkiem.y));
-                    String dystans = Rozne.formatujDystans(Math.round(punkt.zmierzDystans(gpsx, gpsy)));
-                    if(dystans != null) {
-                        Rect zarys = new Rect();
-                        Painty.painttekst[AppService.service.kolorinfo].getTextBounds(dystans, 0, dystans.length(), zarys);
-                        if(AppService.service.kolorinfo == 3) {
-                            rysujProstokat(canvas, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - promienpunktu - 10 - zarys.width(), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - zarys.height() / 2 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                if ((AppService.service.poziominfo == Stale.OPISYODLEGLOSCI) || (AppService.service.poziominfo == Stale.OPISYODLEGLOSCIKOMENTARZE)) {
+                    if (lokalizacja != null) {
+                        String dystans = Rozne.formatujDystans(Math.round(punkt.zmierzDystans(lokalizacja.getLongitude(), lokalizacja.getLatitude())));
+                        if (dystans != null) {
+                            Rect zarys = new Rect();
+                            Painty.painttekst[AppService.service.kolorinfo].getTextBounds(dystans, 0, dystans.length(), zarys);
+                            if (AppService.service.kolorinfo == 3) {
+                                rysujProstokat(canvas, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom + promienpunktu + 4, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - zarys.height() / 2 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                            }
+                            canvas.drawText(dystans, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom + promienpunktu + 7, AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + zarys.height() / 2, Painty.painttekst[AppService.service.kolorinfo]);
                         }
-                        canvas.drawText(dystans, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - promienpunktu - 7 - zarys.width(), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + zarys.height() / 2, Painty.painttekst[AppService.service.kolorinfo]);
+                    }
+                    if (tmiparser != null) {
+                        float gpsx = tmiparser.obliczWspolrzednaXDlaPixela(pixelnadsrodkiem.x);
+                        float gpsy = tmiparser.obliczWspolrzednaYDlaPixela(pixelnadsrodkiem.y);
+                        String dystans = Rozne.formatujDystans(Math.round(punkt.zmierzDystans(gpsx, gpsy)));
+                        if (dystans != null) {
+                            Rect zarys = new Rect();
+                            Painty.painttekst[AppService.service.kolorinfo].getTextBounds(dystans, 0, dystans.length(), zarys);
+                            if (AppService.service.kolorinfo == 3) {
+                                rysujProstokat(canvas, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - promienpunktu - 10 - zarys.width(), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom - zarys.height() / 2 - 3, zarys.width() + 6, zarys.height() + 6, Painty.paintczarnyprostokat);
+                            }
+                            canvas.drawText(dystans, AppService.service.srodekekranu.x + (x - pixelnadsrodkiem.x) * zoom - promienpunktu - 7 - zarys.width(), AppService.service.srodekekranu.y + (y - pixelnadsrodkiem.y) * zoom + zarys.height() / 2, Painty.painttekst[AppService.service.kolorinfo]);
+                        }
                     }
                 }
             }
         }
     }
 
-    private void rysujPunktyObecne(Canvas canvas, Point pixelnadsrodkiem) {
+    private void rysujPunktyObecne(Canvas canvas, Point pixelnadsrodkiem, Location lokalizacja) {
         float promienpunktu = 4 * Painty.density;
         for(int i = 0; i < GPXPunktLogger.lista.size(); i++) {
-            rysujPunktNaMapie(GPXPunktLogger.lista.get(i), canvas, Painty.paintfioletowyokrag, pixelnadsrodkiem, promienpunktu);
+            rysujPunktNaMapie(GPXPunktLogger.lista.get(i), canvas, Painty.paintfioletowyokrag, pixelnadsrodkiem, promienpunktu, lokalizacja);
         }
     }
 
-    private void rysujPunktyGPX(Canvas canvas, Point pixelnadsrodkiem) {
+    private void rysujPunktyGPX(Canvas canvas, Point pixelnadsrodkiem, Location lokalizacja) {
         float promienpunktu = 4 * Painty.density;
         for(int i = 0; i < PlikiGPX.pliki.size(); i++) {
             if(PlikiGPX.pliki.get(i).zaznaczony) {
                 if(AppService.service.poziominfo >= Stale.OPISYPUNKTY) {
                     List<PunktNaMapie> lista = PlikiGPX.pliki.get(i).punkty;
                     for (int j = 0; j < lista.size(); j++) {
-                        rysujPunktNaMapie(lista.get(j), canvas, Painty.paintzielonyokrag, pixelnadsrodkiem, promienpunktu);
+                        rysujPunktNaMapie(lista.get(j), canvas, Painty.paintzielonyokrag, pixelnadsrodkiem, promienpunktu, lokalizacja);
                     }
                 }
             }
@@ -317,8 +335,7 @@ public class RysujWatek extends Thread {
         canvas.drawBitmap(Bitmapy.brakmapy, AppService.service.srodekekranu.x - Bitmapy.brakmapy.getWidth() / 2, AppService.service.srodekekranu.y - Bitmapy.brakmapy.getHeight() / 2, null);
     }
 
-    private void rysujKursorGPS(Canvas canvas, Point pixelnadsrodkiem) {
-        Location lokalizacja = AppService.service.czyJestFix();
+    private void rysujKursorGPS(Canvas canvas, Point pixelnadsrodkiem, Location lokalizacja) {
         if(lokalizacja != null) {
             int x = tmiparser.obliczPixelXDlaWspolrzednej((float) lokalizacja.getLongitude());
             int y = tmiparser.obliczPixelYDlaWspolrzednej((float) lokalizacja.getLatitude());
@@ -334,14 +351,15 @@ public class RysujWatek extends Thread {
             if(canvas != null) {
                 if(atlas != null) {
                     Point pixelnadsrodkiem = new Point(AppService.service.pixelnamapienadsrodkiem);
+                    Location location = AppService.service.czyJestFix();
                     rysujTlo(canvas);
                     rysujMape(canvas);
                     rysujTrasyGPX(canvas, pixelnadsrodkiem);
-                    rysujPunktyGPX(canvas, pixelnadsrodkiem);
-                    rysujKursorGPS(canvas, pixelnadsrodkiem);
+                    rysujPunktyGPX(canvas, pixelnadsrodkiem, location);
+                    rysujKursorGPS(canvas, pixelnadsrodkiem, location);
                     rysujKola(canvas);
                     rysujTraseObecna(canvas, pixelnadsrodkiem);
-                    rysujPunktyObecne(canvas, pixelnadsrodkiem);
+                    rysujPunktyObecne(canvas, pixelnadsrodkiem, location);
                     rysujKompas(canvas);
                     zwolnijCanvas(canvas);
                 } else {
