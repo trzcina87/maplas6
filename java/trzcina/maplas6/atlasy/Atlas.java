@@ -5,6 +5,8 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import trzcina.maplas6.pomoc.Stale;
@@ -70,7 +72,12 @@ public class Atlas {
                     parserytmi.add(tmiparser);
                 }
             }
-
+            Collections.sort(parserytmi, new Comparator<TmiParser>() {
+                @Override
+                public int compare(TmiParser t1, TmiParser t2) {
+                    return Double.valueOf(t2.dokladnosc).compareTo(t1.dokladnosc);
+                }
+            });
             //Jesli dodalismy jakis parser znaczy ze atlas jest sprawny
             if(parserytmi.size() > 0) {
                 stan = Stale.ATLASGOTOWY;
