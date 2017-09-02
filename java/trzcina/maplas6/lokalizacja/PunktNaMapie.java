@@ -24,8 +24,12 @@ public class PunktNaMapie {
         this.opis = opis;
         rectnazwa = new Rect();
         rectopis = new Rect();
-        Painty.paintbialytekst.getTextBounds(nazwa, 0, nazwa.length(), rectnazwa);
-        Painty.paintbialytekst.getTextBounds(opis, 0, opis.length(), rectopis);
+        if(nazwa != null) {
+            Painty.paintbialytekst.getTextBounds(nazwa, 0, nazwa.length(), rectnazwa);
+        }
+        if(opis != null) {
+            Painty.paintbialytekst.getTextBounds(opis, 0, opis.length(), rectopis);
+        }
         lokalizacja = new Location("dummyprovider");
         lokalizacja.setLongitude(wspx);
         lokalizacja.setLatitude(wspy);
