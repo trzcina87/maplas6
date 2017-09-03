@@ -6,10 +6,12 @@ public class PunktWTrasie {
 
     public float wspx;
     public float wspy;
+    public int czassekundy;
 
-    public PunktWTrasie(float wspx, float wspy) {
+    public PunktWTrasie(float wspx, float wspy, int czassekundy) {
         this.wspx = wspx;
         this.wspy = wspy;
+        this.czassekundy = czassekundy;
     }
 
     public static float zmierzDystans(PunktWTrasie p1, PunktWTrasie p2) {

@@ -517,7 +517,7 @@ public class AppService extends Service {
                 Location lokalizacja = czyJestFix();
                 float odlegloscodkursora = 0;
                 if(lokalizacja != null) {
-                    odlegloscodkursora = PunktWTrasie.zmierzDystans(new PunktWTrasie(gpsx, gpsy), new PunktWTrasie((float)lokalizacja.getLongitude(), (float) lokalizacja.getLatitude()));
+                    odlegloscodkursora = PunktWTrasie.zmierzDystans(new PunktWTrasie(gpsx, gpsy, 0), new PunktWTrasie((float)lokalizacja.getLongitude(), (float) lokalizacja.getLatitude(), 0));
                 }
                 long czas = System.currentTimeMillis() - obecnatrasa.czasstart;
                 String czasstring = formatczasu.format(czas);

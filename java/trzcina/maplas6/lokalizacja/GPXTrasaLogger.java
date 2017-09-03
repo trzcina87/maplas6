@@ -88,7 +88,7 @@ public class GPXTrasaLogger {
             printwriter.println("        <desc>" + "dokladnosc:" + dok + "</desc>");
             printwriter.println("      </trkpt>");
             printwriter.flush();
-            lista[iloscpunktow] = new PunktWTrasie(wspx, wspy);
+            lista[iloscpunktow] = new PunktWTrasie(wspx, wspy, (int) (System.currentTimeMillis() / 1000L));
             iloscpunktow = iloscpunktow + 1;
             if(iloscpunktow > 1) {
                 dlugosctrasy = dlugosctrasy + PunktWTrasie.zmierzDystans(lista[iloscpunktow -1], lista[iloscpunktow -2]);

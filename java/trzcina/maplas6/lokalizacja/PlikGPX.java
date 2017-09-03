@@ -150,7 +150,7 @@ public class PlikGPX {
             Node node = lista.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 element = (Element) node;
-                PunktWTrasie punktwtrasie = new PunktWTrasie(Float.parseFloat(element.getAttribute("lon")), Float.parseFloat(element.getAttribute("lat")));
+                PunktWTrasie punktwtrasie = new PunktWTrasie(Float.parseFloat(element.getAttribute("lon")), Float.parseFloat(element.getAttribute("lat")), 0);
                 trasa.add(punktwtrasie);
                 if(poprzedni == null) {
                     String data = pobierzWartoscParametru("time", element);

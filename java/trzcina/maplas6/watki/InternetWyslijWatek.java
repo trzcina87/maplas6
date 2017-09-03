@@ -26,20 +26,20 @@ public class InternetWyslijWatek extends Thread {
     private void wyslijPunkty() {
         int iledowyslania = Math.min(100, obecnatrasa.iloscpunktow - iloscwyslanych);
         String urlstring = Ustawienia.wyslijurl.wartosc + "?nazwa=" + nazwa + "&ilosc=" + iledowyslania + "&";
+        String czasstart = String.valueOf(Math.round(obecnatrasa.czasstart / 1000F));
         for (int i = 0; i < iledowyslania; i++) {
-            String czasstart = String.valueOf(Math.round(obecnatrasa.czasstart / 1000F));
             urlstring = urlstring + "s" + i + "=" + czasstart + "&";
-            urlstring = urlstring + "c" + i + "=" + Math.round(System.currentTimeMillis() / 1000F) + "&";
+            urlstring = urlstring + "c" + i + "=" + obecnatrasa.lista[iloscwyslanych + i].czassekundy + "&";
             urlstring = urlstring + "x" + i + "=" + obecnatrasa.lista[iloscwyslanych + i].wspx + "&";
             urlstring = urlstring + "y" + i + "=" + obecnatrasa.lista[iloscwyslanych + i].wspy + "&";
-            String odp = HTTP.sciagnijPlik(urlstring, Ustawienia.downloaduser.wartosc, Ustawienia.downloadpass.wartosc, null);
-            if (odp != null) {
-                if (odp.startsWith("MAPLASOK")) {
-                    iloscwyslanych = iloscwyslanych + iledowyslania;
-                    ostatniawysylka = System.currentTimeMillis();
-                    if(iloscwyslanych + 100 < obecnatrasa.iloscpunktow) {
-                        ostatniawysylka = ostatniawysylka - 55 * 1000;
-                    }
+        }
+        String odp = HTTP.sciagnijPlik(urlstring, Ustawienia.downloaduser.wartosc, Ustawienia.downloadpass.wartosc, null);
+        if (odp != null) {
+            if (odp.startsWith("MAPLASOK")) {
+                iloscwyslanych = iloscwyslanych + iledowyslania;
+                ostatniawysylka = System.currentTimeMillis();
+                if(iloscwyslanych + 100 < obecnatrasa.iloscpunktow) {
+                    ostatniawysylka = ostatniawysylka - 60 * 1000;
                 }
             }
         }
