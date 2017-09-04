@@ -139,15 +139,17 @@ public class RysujWatek extends Thread {
             int dodatkowykafely = 1;
             for(int i = -ilosckafliwlewo; i <= ilosckafliwlewo + dodatkowykafelx; i++) {
                 for(int j = -ilosckafliwgore; j <= ilosckafliwgore + dodatkowykafely; j++) {
-                    if(AppService.service.wczytajwatek.czyBitmapaWczytana(centralnykafel.x + i, centralnykafel.y + j)) {
-                        Bitmap kafel = AppService.service.wczytajwatek.bitmapy[centralnykafel.x + i][centralnykafel.y + j];
-                        int rozmiarxpozoom = (int) (zoom * kafel.getWidth());
-                        int rozmiarypozoom = (int) (zoom * kafel.getHeight());
-                        int lewo = (int)(startcentralnegokaflax + i * tmiparser.rozmiarkafla.x * zoom);
-                        int gora = (int)(startcentralnegokaflay + j * tmiparser.rozmiarkafla.y * zoom);
-                        canvas.drawBitmap(kafel, new Rect(0, 0, kafel.getWidth(), kafel.getHeight()), new Rect(lewo, gora, lewo + rozmiarxpozoom, gora + rozmiarypozoom), null);
-                    } else {
-                        odswiez = true;
+                    if((centralnykafel.x + i >= 0) && (centralnykafel.y + j >= 0) && (centralnykafel.x + i < tmiparser.ilosckafli.x) && (centralnykafel.y + j < tmiparser.ilosckafli.y)) {
+                        if (AppService.service.wczytajwatek.czyBitmapaWczytana(centralnykafel.x + i, centralnykafel.y + j)) {
+                            Bitmap kafel = AppService.service.wczytajwatek.bitmapy[centralnykafel.x + i][centralnykafel.y + j];
+                            int rozmiarxpozoom = (int) (zoom * kafel.getWidth());
+                            int rozmiarypozoom = (int) (zoom * kafel.getHeight());
+                            int lewo = (int) (startcentralnegokaflax + i * tmiparser.rozmiarkafla.x * zoom);
+                            int gora = (int) (startcentralnegokaflay + j * tmiparser.rozmiarkafla.y * zoom);
+                            canvas.drawBitmap(kafel, new Rect(0, 0, kafel.getWidth(), kafel.getHeight()), new Rect(lewo, gora, lewo + rozmiarxpozoom, gora + rozmiarypozoom), null);
+                        } else {
+                            odswiez = true;
+                        }
                     }
                 }
             }

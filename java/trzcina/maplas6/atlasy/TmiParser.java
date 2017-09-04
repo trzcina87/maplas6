@@ -614,8 +614,13 @@ public class TmiParser {
             return Math.round(rozmiarmapy.y - procentwspolrzednej * rozmiarmapy.y);
         } else {
             long wartoscmerkatoradlawspolrzednej = Rozne.pomnoz5(wspolrzedna) - 4800000;
-            double procent = (AppService.service.plikmerkatora[(int) wartoscmerkatoradlawspolrzednej] - poczatekmerkatora) / (double) rozpietoscmerkatora;
-            return (int) (rozmiarmapy.y - procent * rozmiarmapy.y);
+            if ((wartoscmerkatoradlawspolrzednej >= 0) && (wartoscmerkatoradlawspolrzednej < AppService.service.plikmerkatora.length)) {
+                double procent = (AppService.service.plikmerkatora[(int) wartoscmerkatoradlawspolrzednej] - poczatekmerkatora) / (double) rozpietoscmerkatora;
+                return (int) (rozmiarmapy.y - procent * rozmiarmapy.y);
+            } else {
+                float procentwspolrzednej = (wspolrzedna - gpsstart.y) / rozpietoscygeograficzna;
+                return Math.round(rozmiarmapy.y - procentwspolrzednej * rozmiarmapy.y);
+            }
         }
     }
 
