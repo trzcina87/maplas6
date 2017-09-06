@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import trzcina.maplas6.AppService;
 import trzcina.maplas6.pomoc.Rozne;
+import trzcina.maplas6.pomoc.Wear;
 
 @SuppressWarnings("MissingPermission")
 public class GPSListener implements LocationListener, GpsStatus.Listener {
@@ -33,6 +34,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
             if(obecnatrasa != null) {
                 if(obecnatrasa.iloscpunktow == 0) {
                     AppService.service.zaproponujZmianeMapy(new Location(location));
+                    Wear.wyslijInfoONowejTrasie();
                 }
                 obecnatrasa.zapiszPunkt(Rozne.zaokraglij5((float) location.getLongitude()), Rozne.zaokraglij5((float) location.getLatitude()), location.getAccuracy());
                 ostatnialokalizacja = location;
@@ -46,6 +48,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
             }
             AppService.service.rysujwatek.odswiez = true;
             AppService.service.odswiezUI();
+            Wear.wyslijLokalizacjeDoZegarkaTrasa(location);
         }
     }
 
@@ -93,6 +96,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
                 }
                 AppService.service.rysujwatek.odswiez = true;
                 AppService.service.odswiezUI();
+                Wear.wyslijLokalizacjeDoZegarka(ostatnialokalizacjazgps);
                 break;
             case GpsStatus.GPS_EVENT_FIRST_FIX:
                 break;

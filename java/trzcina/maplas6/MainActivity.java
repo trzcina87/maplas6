@@ -53,6 +53,7 @@ import trzcina.maplas6.pomoc.Painty;
 import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.pomoc.Uprawnienia;
+import trzcina.maplas6.pomoc.Wear;
 import trzcina.maplas6.ustawienia.Ustawienia;
 
 @SuppressWarnings({"PointlessBooleanExpression", "NullableProblems", "StatementWithEmptyBody"})
@@ -541,6 +542,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 zapiszCheckBoxyWPokazPliki();
                 zamknijPokazPlikiIWrocDoMapy();
+                Wear.wyslijNoweZaznaczone();
             }
         });
         pokazplikiusun.setOnClickListener(new View.OnClickListener() {

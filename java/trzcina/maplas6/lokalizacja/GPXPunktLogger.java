@@ -13,6 +13,7 @@ import java.util.TimeZone;
 
 import trzcina.maplas6.AppService;
 import trzcina.maplas6.pomoc.Stale;
+import trzcina.maplas6.pomoc.Wear;
 import trzcina.maplas6.ustawienia.Ustawienia;
 
 public class GPXPunktLogger {
@@ -79,6 +80,7 @@ public class GPXPunktLogger {
             printwriter.println("  </wpt>");
             printwriter.flush();
             lista.add(new PunktNaMapie(wspx, wspy, nazwa, komentarz));
+            Wear.wyslijPunktDoZegarka(new PunktNaMapie(wspx, wspy, nazwa, komentarz));
             return true;
         } catch (Exception e) {
             e.printStackTrace();

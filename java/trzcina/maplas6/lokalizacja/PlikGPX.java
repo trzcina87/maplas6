@@ -36,6 +36,7 @@ public class PlikGPX {
     public List<PunktWTrasie> trasa;
     public Boolean zaznaczony;
     public long rozmiar;
+    public long rozmiarbajty;
     public float dlugosctrasy;
     public long czastrasy;
 
@@ -47,10 +48,12 @@ public class PlikGPX {
         trasa = new ArrayList<>(100);
         zaznaczony = false;
         rozmiar = 0;
+        rozmiarbajty = 0;
         dlugosctrasy = 0;
         czastrasy = 0;
         try {
             rozmiar = new File(sciezka).length();
+            rozmiarbajty = rozmiar;
             rozmiar = Math.round(rozmiar / (double)1024);
         } catch (Exception e) {
             e.printStackTrace();

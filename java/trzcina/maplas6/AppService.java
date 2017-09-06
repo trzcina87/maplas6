@@ -56,6 +56,7 @@ import trzcina.maplas6.pomoc.OdbiorZNotyfikacji;
 import trzcina.maplas6.pomoc.Przygotowanie;
 import trzcina.maplas6.pomoc.Rozne;
 import trzcina.maplas6.pomoc.Stale;
+import trzcina.maplas6.pomoc.Wear;
 import trzcina.maplas6.ustawienia.Ustawienia;
 import trzcina.maplas6.watki.DzwiekiWatek;
 import trzcina.maplas6.watki.InternetWyslijWatek;
@@ -292,6 +293,8 @@ public class AppService extends Service {
             @Override
             public void run() {
 
+                Wear.ustawApi();
+
                 listaplikowaplikacji = Arrays.asList(MainActivity.activity.fileList());
 
                 //Tworzymy niezbene katalogi
@@ -310,7 +313,6 @@ public class AppService extends Service {
                 Bitmapy.inicjujBitmapy();
 
                 //Merkator
-                //Wczytujemy bitmapy do pamieci
                 MainActivity.activity.ustawProgressPrzygotowanie(4);
                 MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje plik Merkatora...");
                 wczytajPlikMerkatora();
@@ -1002,6 +1004,7 @@ public class AppService extends Service {
             widok = Stale.WIDOKBRAK;
             wyrejestrujGPS();
             zakonczWatki();
+            Wear.wylaczAPI();
         } catch (Exception e) {
             e.printStackTrace();
         }
