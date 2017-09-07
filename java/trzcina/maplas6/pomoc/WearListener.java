@@ -16,7 +16,10 @@ import java.io.InputStreamReader;
 import trzcina.maplas6.AppService;
 import trzcina.maplas6.MainActivity;
 import trzcina.maplas6.lokalizacja.GPXPunktLogger;
+import trzcina.maplas6.lokalizacja.GPXTrasaLogger;
 import trzcina.maplas6.lokalizacja.PlikiGPX;
+import trzcina.maplas6.lokalizacja.PunktNaMapie;
+import trzcina.maplas6.lokalizacja.PunktWTrasie;
 
 @SuppressWarnings("PointlessBooleanExpression")
 public class WearListener implements MessageApi.MessageListener {
@@ -64,6 +67,7 @@ public class WearListener implements MessageApi.MessageListener {
                 boolean zapis = AppService.service.zapiszPunktPozycjaGPS(wpis, "");
                 if(zapis == true) {
                     Wear.wyslijWiadomosc(messageEvent.getPath(), "TRUE");
+                    MainActivity.activity.pokazToast("Zapisano: " + wpis);
                 } else {
                     Wear.wyslijWiadomosc(messageEvent.getPath(), "FALSE");
                     MainActivity.activity.pokazToast("Blad zapisu! Sprawdz GPS!");
@@ -87,6 +91,32 @@ public class WearListener implements MessageApi.MessageListener {
         }
     }
 
+    private void obsluzOBECNEPUNKTY(MessageEvent messageEvent) {
+        if(messageEvent.getPath().startsWith("OBECNEPUNKTY:")) {
+            String dowsylania = "";
+            for(int i = 0; i < GPXPunktLogger.lista.size(); i++) {
+                PunktNaMapie punkt = GPXPunktLogger.lista.get(i);
+                dowsylania = dowsylania + punkt.wspx + "^" + punkt.wspy + "^" + punkt.nazwa + "^" + punkt.opis + ":";
+            }
+            Wear.wyslijWiadomosc(messageEvent.getPath(), dowsylania);
+        }
+    }
+
+    private void obsluzOBECNATRASA(MessageEvent messageEvent) {
+        if(messageEvent.getPath().startsWith("OBECNATRASA:")) {
+            String dowsylania = "";
+            GPXTrasaLogger obecna = AppService.service.obecnatrasa;
+            if(obecna != null) {
+                for (int i = 0; i < obecna.iloscpunktow; i++) {
+                    PunktWTrasie punkt = obecna.lista[i];
+                    dowsylania = dowsylania + punkt.wspx + "^" + punkt.wspy + ":";
+                }
+                dowsylania = dowsylania + obecna.czasstart;
+            }
+            Wear.wyslijWiadomosc(messageEvent.getPath(), dowsylania);
+        }
+    }
+
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         obsluzPING(messageEvent);
@@ -94,5 +124,7 @@ public class WearListener implements MessageApi.MessageListener {
         obsluzFILEGET(messageEvent);
         obsluzPOINT(messageEvent);
         obsluzZAZNACZONE(messageEvent);
+        obsluzOBECNEPUNKTY(messageEvent);
+        obsluzOBECNATRASA(messageEvent);
     }
 }

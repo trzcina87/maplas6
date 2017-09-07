@@ -632,21 +632,4 @@ public class TmiParser {
         }
     }
 
-    private void debugTMI() {
-        Log.e("WWW", sciezka);
-        Log.e("WWW", rozmiarkafla.x + " " + rozmiarkafla.y);
-        Log.e("WWW", ilosckafli.x + " " + ilosckafli.y);
-        Log.e("WWW", rozszerzenie);
-        Log.e("WWW", prefix);
-        for(int i = 0; i < ilosckafli.x; i++) {
-            for(int j = 0; j < ilosckafli.y; j++) {
-                Log.e("WWW", i + " " + j + ": " + startkafla[i][j] + " " + dlugosckafla[i][j]);
-            }
-        }
-        Log.e("WWW", String.valueOf(mapstart + " " + mapdlugosc));
-        Log.e("WWW", rozmiarmapy.x + " " + rozmiarmapy.y);
-        Log.e("WWW", gpsstart.x + " " + gpsstart.y);
-        Log.e("WWW", gpskoniec.x + " " + gpskoniec.y);
-    }
-
 }

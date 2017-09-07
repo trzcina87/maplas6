@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import trzcina.maplas6.atlasy.Atlas;
 import trzcina.maplas6.atlasy.Atlasy;
@@ -993,6 +995,16 @@ public class AppService extends Service {
         zakonczWatekGPS();
     }
 
+    private void zabijProces() {
+        Timer timer = new Timer();
+        timer.schedule( new TimerTask() {
+            public void run() {
+                int pid = android.os.Process.myPid();
+                android.os.Process.killProcess(pid);
+            }
+        }, 1000);
+    }
+
     public void zakonczUsluge() {
         try {
             GPXPunktLogger.zakonczPlik();
@@ -1009,6 +1021,7 @@ public class AppService extends Service {
             e.printStackTrace();
         }
         Toast.makeText(getApplicationContext(), Komunikaty.KONIECPROGRAMU, Toast.LENGTH_SHORT).show();
+        zabijProces();
     }
 
     //Zakonczenie apliakcji, konczymy watki, zerujemy zmienne i pokazujemy komunikat
