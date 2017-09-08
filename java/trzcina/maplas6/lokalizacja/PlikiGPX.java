@@ -109,6 +109,7 @@ public class PlikiGPX {
 
             //Dla kazdego katalogu w katalogu z mapami tworzymy atlas
             for(int i = 0; i < plikiwkatalogu.length; i++) {
+                MainActivity.activity.ustawInfoPrzygotowanie("Wczytuje: " + plikiwkatalogu[i].getName());
                 PlikGPX plikgpx = new PlikGPX(plikiwkatalogu[i].getAbsolutePath());
                 plikgpx.naprawJesliTrzeba();
                 plikgpx.parsuj();

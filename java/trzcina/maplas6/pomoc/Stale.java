@@ -59,4 +59,5 @@ public class Stale {
     public static String INSTRUKCJA = "1) Dwukrotkne dotknięcie w trybie mapy na środek powoduje przesunięcie mapy do aktualnej pozycji GPS" + ENTER + ENTER + "2) Kliknięcie na współrzędne GPS powoduje zmianę stylu wyświetlania informacji" + ENTER + ENTER + "3) Cyfra przy kompasie - dokładność, równa 3 jeśli kompas dobrze skalibrowany" + ENTER + ENTER + "4) Dlugie przycisniecie MENU - możliwość zakończenia trassy bez zapisywania";
 
     public static int GACCONNTIMEOUT = 5;
+    public static int GACDATALIIT = 90000;
 }

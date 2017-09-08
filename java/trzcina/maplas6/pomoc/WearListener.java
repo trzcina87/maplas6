@@ -102,6 +102,22 @@ public class WearListener implements MessageApi.MessageListener {
         }
     }
 
+    private void obsluzSTOPGPS(MessageEvent messageEvent) {
+        if(messageEvent.getPath().startsWith("STOPGPS")) {
+            Wear.wysylajprecyzyjnygps = false;
+        }
+    }
+
+    private void obsluzSTARTGPS(MessageEvent messageEvent) {
+        if(messageEvent.getPath().startsWith("STARTGPS")) {
+            Wear.wysylajprecyzyjnygps = true;
+            Location lok = AppService.service.czyJestFix();
+            if(lok != null) {
+                Wear.wyslijLokalizacjeDoZegarka(lok);
+            }
+        }
+    }
+
     private void obsluzOBECNATRASA(MessageEvent messageEvent) {
         if(messageEvent.getPath().startsWith("OBECNATRASA:")) {
             String dowsylania = "";
@@ -126,5 +142,7 @@ public class WearListener implements MessageApi.MessageListener {
         obsluzZAZNACZONE(messageEvent);
         obsluzOBECNEPUNKTY(messageEvent);
         obsluzOBECNATRASA(messageEvent);
+        obsluzSTOPGPS(messageEvent);
+        obsluzSTARTGPS(messageEvent);
     }
 }

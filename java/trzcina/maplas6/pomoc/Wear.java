@@ -8,6 +8,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,11 +22,17 @@ public class Wear {
     private static WearListener wearlistener = null;
     private static GoogleApiClient gac = null;
     public static String telefon = null;
+    public static volatile boolean wysylajprecyzyjnygps = true;
 
     public static void wyslijLokalizacjeDoZegarka(Location location) {
         if(telefon != null) {
-            String dane = location.getLongitude() + ":" + location.getLatitude() + ":" + location.getTime();
-            wyslijWiadomosc("GPS", dane);
+            if(wysylajprecyzyjnygps == true) {
+                String dane = location.getLongitude() + ":" + location.getLatitude() + ":" + location.getTime();
+                wyslijWiadomosc("GPS", dane);
+                Log.e("WWW20", "wyslalem info o GPS");
+            } else {
+                Log.e("WWW20", "nie wyslalem info o GPS");
+            }
         }
     }
 
@@ -65,12 +72,34 @@ public class Wear {
         Wearable.MessageApi.sendMessage(gac, telefon, wiadomosc, null);
     }
 
+    private static int sufitZInta(int a, int dzielnik) {
+        if(a % dzielnik == 0) {
+            return a / dzielnik;
+        } else {
+            return (a / dzielnik) + 1;
+        }
+    }
+
     public static void wyslijWiadomosc(String wiadomosc, String dane) {
-        Wearable.MessageApi.sendMessage(gac, telefon, wiadomosc, dane.getBytes());
+        if(dane.length() <= Stale.GACDATALIIT) {
+            Wearable.MessageApi.sendMessage(gac, telefon, wiadomosc, dane.getBytes());
+        }
     }
 
     public static void wyslijWiadomosc(String wiadomosc, byte[] dane) {
-        Wearable.MessageApi.sendMessage(gac, telefon, wiadomosc, dane);
+        if(dane.length <= Stale.GACDATALIIT) {
+            Wearable.MessageApi.sendMessage(gac, telefon, wiadomosc, dane);
+        } else {
+            int ilesegmentow = sufitZInta(dane.length, Stale.GACDATALIIT);
+            for(int i = 0; i < ilesegmentow; i++) {
+                int rozmiarsegmentu = Stale.GACDATALIIT;
+                if(i == ilesegmentow - 1) {
+                    rozmiarsegmentu = dane.length - ((ilesegmentow - 1) * Stale.GACDATALIIT);
+                }
+                byte[] dowyslania = Arrays.copyOfRange(dane, i * Stale.GACDATALIIT, i * Stale.GACDATALIIT + rozmiarsegmentu);
+                Wearable.MessageApi.sendMessage(gac, telefon, wiadomosc + ":" + dane.length + ":" + i, dowyslania);
+            }
+        }
     }
 
     public static GoogleApiClient ustawApi() {
@@ -95,5 +124,6 @@ public class Wear {
         wearlistener = null;
         gac = null;
         telefon = null;
+        wysylajprecyzyjnygps = true;
     }
 }
