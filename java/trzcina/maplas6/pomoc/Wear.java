@@ -29,9 +29,6 @@ public class Wear {
             if(wysylajprecyzyjnygps == true) {
                 String dane = location.getLongitude() + ":" + location.getLatitude() + ":" + location.getTime();
                 wyslijWiadomosc("GPS", dane);
-                Log.e("WWW20", "wyslalem info o GPS");
-            } else {
-                Log.e("WWW20", "nie wyslalem info o GPS");
             }
         }
     }

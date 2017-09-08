@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.Iterator;
 
@@ -93,10 +94,10 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
                 if(ostatnialokalizacja != null) {
                     AppService.service.dzwiekiwatek.czasostatniejlokalizacji = ostatnialokalizacjazgps.getTime();
                     dokladnosc = Math.round(ostatnialokalizacjazgps.getAccuracy());
+                    Wear.wyslijLokalizacjeDoZegarka(ostatnialokalizacjazgps);
                 }
                 AppService.service.rysujwatek.odswiez = true;
                 AppService.service.odswiezUI();
-                Wear.wyslijLokalizacjeDoZegarka(ostatnialokalizacjazgps);
                 break;
             case GpsStatus.GPS_EVENT_FIRST_FIX:
                 break;
