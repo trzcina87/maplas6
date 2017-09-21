@@ -225,6 +225,7 @@
             <Button
                 android:text="Zapisz"
                 android:id="@+id/projektujzapisz"
+                android:visibility="gone"
                 android:tag="Punkt"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
@@ -270,6 +271,7 @@
             android:id="@+id/projektujzapiszpoziom"
             android:layout_weight="2"
             android:tag="Punkt"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
