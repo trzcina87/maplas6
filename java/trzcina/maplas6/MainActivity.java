@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView statuszoom;
     public MainSurface surface;
     public EditText wyslijurl;
+    public EditText numertelefonu;
     public TextView kontrasttextview;
     public SeekBar kontrastseekbar;
     public TextView nasycenietextview;
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         nasycenietextview = (TextView)opcjepodstawowelayout.findViewById(R.id.nasycenietextview);
         nasycenieseekbar = (SeekBar) opcjepodstawowelayout.findViewById(R.id.nasycenieseekbar);
         wyslijurl = (EditText)opcjezaawansowanelayout.findViewById(R.id.wyslijurl);
+        numertelefonu = (EditText)opcjezaawansowanelayout.findViewById(R.id.numertelefonu);
         imageviewinternet = (ImageView)maplayout.findViewById(R.id.imageviewinternet);
         layoutzgpstextview = (LinearLayout)maplayout.findViewById(R.id.layoutzgpstextview);
     }

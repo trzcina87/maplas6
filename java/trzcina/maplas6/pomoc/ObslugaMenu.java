@@ -82,6 +82,9 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
                 AppService.service.trybtelewizyjny = ! AppService.service.trybtelewizyjny;
                 MainActivity.activity.ustawTrybTelewizyjny();
                 return true;
+            case R.id.wyslijsmsitem:
+                AppService.service.wyslijSMSZLokcalizacja();
+                return true;
         }
         return true;
     }

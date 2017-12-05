@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -125,6 +126,23 @@ public class AppService extends Service {
     public volatile int ktoryfoldermap;
 
     public List<String> listafolderowmap;
+
+    public void wyslijSMSZLokcalizacja() {
+        Location ostatnia = AppService.service.czyJestFix();
+        if(ostatnia == null) {
+            MainActivity.activity.pokazToast("Lokalizacja nieustalona!");
+        } else {
+            String telefon = "";
+            if(Ustawienia.numertelefonu.wartosc != null) {
+                telefon = Ustawienia.numertelefonu.wartosc;
+            }
+            Uri smsuri = Uri.parse("smsto:" + telefon);
+            Intent smsintent = new Intent(Intent.ACTION_SENDTO, smsuri);
+            smsintent.putExtra("sms_body", "Moja lokalizacja: " + Rozne.zaokraglij5((float) ostatnia.getLatitude()) + " " + Rozne.zaokraglij5((float) ostatnia.getLongitude()));
+            smsintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(smsintent);
+        }
+    }
 
     public void znajdzFolderyMap() {
         ktoryfoldermap = 0;

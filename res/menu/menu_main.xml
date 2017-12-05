@@ -6,6 +6,11 @@
         android:title="Informacja"
         android:visible="true"/>
     <item
+        android:id="@+id/wyslijsmsitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Wyslij SMS z lokalizacja"
+        android:visible="true"/>
+    <item
         android:id="@+id/dzwiekiitem"
         android:showAsAction="ifRoom|withText"
         android:title="Dźwięki"

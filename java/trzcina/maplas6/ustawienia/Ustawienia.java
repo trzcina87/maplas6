@@ -17,6 +17,7 @@ public class Ustawienia {
     public static UstawienieString downloadpass;
     public static UstawienieString uploadurl;
     public static UstawienieString wyslijurl;
+    public static UstawienieString numertelefonu;
     public static UstawienieIntSeekBar kontrast;
     public static UstawienieIntSeekBar nasycenie;
 
@@ -34,6 +35,7 @@ public class Ustawienia {
         downloaduser = new UstawienieString(Stale.DOWNLOADUSER, null, "downloaduser", MainActivity.activity.downloaduser);
         uploadurl = new UstawienieString(Stale.UPLOADURL, null, "uploadurl", MainActivity.activity.uploadurl);
         wyslijurl = new UstawienieString(Stale.SENDURL, null, "wyslijurl", MainActivity.activity.wyslijurl);
+        numertelefonu = new UstawienieString("", null, "numertelefonu", MainActivity.activity.numertelefonu);
         kontrast = new UstawienieIntSeekBar(0, 0, "kontrast", MainActivity.activity.kontrasttextview, MainActivity.activity.kontrastseekbar, 0, 20, 1, true);
         nasycenie = new UstawienieIntSeekBar(0, 0, "nasycenie", MainActivity.activity.nasycenietextview, MainActivity.activity.nasycenieseekbar, 0, 20, 1, true);
         ustawienia.add(nazwaurzadzenia);
@@ -46,6 +48,7 @@ public class Ustawienia {
         ustawienia.add(wyslijurl);
         ustawienia.add(kontrast);
         ustawienia.add(nasycenie);
+        ustawienia.add(numertelefonu);
     }
 
     //Zapisujemy do pamieci wartosci domyslne jesli nie ma w ogole
