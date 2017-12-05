@@ -97,6 +97,11 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
                     Wear.wyslijLokalizacjeDoZegarka(ostatnialokalizacjazgps);
                 }
                 AppService.service.rysujwatek.odswiez = true;
+                if(AppService.service.wlaczgps == false) {
+                    iloscsatelitow = 0;
+                    iloscaktywnychsatelitow = 0;
+                    dokladnosc = 0;
+                }
                 AppService.service.odswiezUI();
                 break;
             case GpsStatus.GPS_EVENT_FIRST_FIX:

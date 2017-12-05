@@ -105,6 +105,7 @@ public class AppService extends Service {
     public volatile boolean precyzyjnygps;
     public volatile boolean grajdzwieki;
     public volatile boolean trybsamochodowy;
+    public volatile boolean trybtelewizyjny;
     public volatile boolean internetwyslij;
 
     //Notyfikcja
@@ -150,6 +151,7 @@ public class AppService extends Service {
         precyzyjnygps = true;
         wlaczgps = false;
         grajdzwieki = true;
+        trybtelewizyjny = false;
         trybsamochodowy = false;
         gpszarejestrowany = false;
         przesuwajmapezgps = false;

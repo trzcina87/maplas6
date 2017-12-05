@@ -21,6 +21,7 @@ import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -55,6 +56,9 @@ import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.pomoc.Uprawnienia;
 import trzcina.maplas6.pomoc.Wear;
 import trzcina.maplas6.ustawienia.Ustawienia;
+
+import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
+import static android.widget.RelativeLayout.ALIGN_PARENT_TOP;
 
 @SuppressWarnings({"PointlessBooleanExpression", "NullableProblems", "StatementWithEmptyBody"})
 public class MainActivity extends AppCompatActivity {
@@ -648,6 +652,13 @@ public class MainActivity extends AppCompatActivity {
                 Ustawienia.uzupelnijPoleWOpcjachZDomyslnych();
             }
         });
+        View decor = getWindow().getDecorView();
+        decor.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int i) {
+                ustawTrybTelewizyjny();
+            }
+        });
     }
 
     private void zmienStylJednegoTextView(TextView tv) {
@@ -776,6 +787,7 @@ public class MainActivity extends AppCompatActivity {
                 menuglowne.getMenu().findItem(R.id.dzwiekiitem).setChecked(AppService.service.grajdzwieki);
                 menuglowne.getMenu().findItem(R.id.trybsamochodowyitem).setChecked(AppService.service.trybsamochodowy);
                 menuglowne.getMenu().findItem(R.id.internetitem).setChecked(AppService.service.internetwyslij);
+                menuglowne.getMenu().findItem(R.id.trybtelewizyjnyitem).setChecked(AppService.service.trybtelewizyjny);
                 menuglowne.show();
             }
         });
@@ -809,6 +821,38 @@ public class MainActivity extends AppCompatActivity {
                 soundpula.play(id, glosnosc, glosnosc, 0, 0, 1.0F);
             }
         });
+    }
+
+    public void ustawTrybTelewizyjny() {
+        if(AppService.service.trybtelewizyjny == true) {
+            luxtextview.setVisibility(View.INVISIBLE);
+            satelitytextview.setVisibility(View.INVISIBLE);
+            imageviewinternet.setVisibility(View.INVISIBLE);
+            satelitaimageview.setVisibility(View.INVISIBLE);
+            layoutzgpstextview.setVisibility(View.INVISIBLE);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(ALIGN_PARENT_TOP);
+            params.addRule(ALIGN_PARENT_RIGHT);
+            statuszoom.setLayoutParams(params);
+        } else {
+            luxtextview.setVisibility(View.VISIBLE);
+            satelitytextview.setVisibility(View.VISIBLE);
+            imageviewinternet.setVisibility(View.VISIBLE);
+            satelitaimageview.setVisibility(View.VISIBLE);
+            layoutzgpstextview.setVisibility(View.VISIBLE);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(0);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(ALIGN_PARENT_TOP);
+            params.addRule(RelativeLayout.START_OF, satelitytextview.getId());
+            params.setMargins(0, (int) (getResources().getDisplayMetrics().density * 24 + 0.5f), 0, 0);
+            statuszoom.setPadding((int) (getResources().getDisplayMetrics().density * 4 + 0.5f), 0, 0, 0);
+            statuszoom.setLayoutParams(params);
+        }
     }
 
     //Pokazuje konunikat w watku UI

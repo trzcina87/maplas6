@@ -77,6 +77,11 @@ public class ObslugaMenu implements PopupMenu.OnMenuItemClickListener {
             case R.id.przelaczpogps:
                 AppService.service.przelaczajpogps = ! AppService.service.przelaczajpogps;
                 return true;
+
+            case R.id.trybtelewizyjnyitem:
+                AppService.service.trybtelewizyjny = ! AppService.service.trybtelewizyjny;
+                MainActivity.activity.ustawTrybTelewizyjny();
+                return true;
         }
         return true;
     }

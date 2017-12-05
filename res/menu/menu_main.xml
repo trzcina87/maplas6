@@ -12,6 +12,12 @@
         android:checkable="true"
         android:visible="true"/>
     <item
+        android:id="@+id/trybtelewizyjnyitem"
+        android:showAsAction="ifRoom|withText"
+        android:title="Tryb telewizyjny"
+        android:checkable="true"
+        android:visible="true"/>
+    <item
         android:id="@+id/trybsamochodowyitem"
         android:showAsAction="ifRoom|withText"
         android:title="Tryb samochodowy"
