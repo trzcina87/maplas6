@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Environment;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
@@ -37,9 +38,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -119,6 +122,48 @@ public class AppService extends Service {
     public long[] plikmerkatora;
 
     public volatile int zoom;
+    public volatile int ktoryfoldermap;
+
+    public List<String> listafolderowmap;
+
+    public void znajdzFolderyMap() {
+        ktoryfoldermap = 0;
+        listafolderowmap = new ArrayList<>(10);
+        Set<String> zbior = new HashSet<>(10);
+        String s = "";
+        try {
+            Process process = new ProcessBuilder().command("cat", "/proc/mounts").redirectErrorStream(true).start();
+            process.waitFor();
+            InputStream is = process.getInputStream();
+            byte[] buffer = new byte[1024];
+            int ilosc = is.read(buffer);
+            if (ilosc != -1) {
+                s = s + new String(buffer, 0, ilosc);
+            }
+            while (ilosc != -1) {
+                ilosc = is.read(buffer);
+                if (ilosc != -1) {
+                    s = s + new String(buffer, 0, ilosc);
+                }
+            }
+            is.close();
+            s = s + "\n" + "sdcard " + Environment.getExternalStorageDirectory().getPath();
+            String[] lines = s.split("\n");
+            for (String line : lines) {
+                String[] wpisy = line.split("\\s+");
+                if(wpisy.length >= 2) {
+                    if(new File(wpisy[1] + "/" + "MAPY").exists() == true) {
+                        if(new File(wpisy[1] + "/" + "MAPY").isDirectory() == true) {
+                            zbior.add(wpisy[1] + "/" + "MAPY/");
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        listafolderowmap.addAll(zbior);
+    }
 
     //Zerowanie watkow
     private void watkiNaNull() {

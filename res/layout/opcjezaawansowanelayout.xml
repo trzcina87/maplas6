@@ -21,12 +21,28 @@
                 android:text="Folder z mapami"
                 android:layout_height="wrap_content" />
 
-            <EditText
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:singleLine="true"
-                android:maxLines="1"
-                android:id="@+id/foldermapyedittext"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <EditText
+                    android:id="@+id/foldermapyedittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+
+                <Button
+                    android:id="@+id/szukajmapbutton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Szukaj" />
+
+            </LinearLayout>
 
             <TextView
                 android:paddingTop="12dp"

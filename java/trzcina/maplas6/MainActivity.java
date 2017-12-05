@@ -56,6 +56,7 @@ import trzcina.maplas6.pomoc.Stale;
 import trzcina.maplas6.pomoc.Uprawnienia;
 import trzcina.maplas6.pomoc.Wear;
 import trzcina.maplas6.ustawienia.Ustawienia;
+import trzcina.maplas6.ustawienia.Ustawienie;
 
 import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
 import static android.widget.RelativeLayout.ALIGN_PARENT_TOP;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     public LinearLayout layoutzgpstextview;
     public Button opcjeanuluj;
     public Button opcjezapisz;
+    public Button szukajmapbutton;
     private TextView textinfoprzygotowanie;
     private ProgressBar progressbarprzygotowanie;
     private TextView luxtextview;
@@ -220,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
         satelitaimageview = (ImageView)maplayout.findViewById(R.id.imageviewsatelita);
         wyczysccache = (Button)opcjezaawansowanelayout.findViewById(R.id.wyczysccache);
         ustawieniadomyslne = (Button)opcjezaawansowanelayout.findViewById(R.id.ustawieniadomyslne);
+        szukajmapbutton = (Button)opcjezaawansowanelayout.findViewById(R.id.szukajmapbutton);
         szybkipunktimageview = (ImageView)maplayout.findViewById(R.id.szybkipunkt);
         statuszoom = (TextView)maplayout.findViewById(R.id.statuszoom);
         kontrasttextview = (TextView)opcjepodstawowelayout.findViewById(R.id.kontrasttextview);
@@ -659,6 +662,17 @@ public class MainActivity extends AppCompatActivity {
                 ustawTrybTelewizyjny();
             }
         });
+        szukajmapbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(AppService.service.listafolderowmap.size() == 0) {
+                    pokazToast("Brak folderów z mapami");
+                } else {
+                    folderzmapami.setText(AppService.service.listafolderowmap.get(AppService.service.ktoryfoldermap));
+                    AppService.service.ktoryfoldermap = (AppService.service.ktoryfoldermap + 1) % AppService.service.listafolderowmap.size();
+                }
+            }
+        });
     }
 
     private void zmienStylJednegoTextView(TextView tv) {
@@ -945,6 +959,7 @@ public class MainActivity extends AppCompatActivity {
     //Przechodzi do widoku opcji i wypelnia go
     public void pokazOpcjeView() {
         AppService.service.widok = Stale.WIDOKOPCJI;
+        AppService.service.znajdzFolderyMap();
         contentviewlayout.removeAllViews();
         contentviewlayout.addView(opcjelayout, 0);
         Ustawienia.wczytajDoPol();

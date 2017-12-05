@@ -1,9 +1,11 @@
 package trzcina.maplas6.pomoc;
 
+import android.os.Environment;
+
 public class Stale {
 
     //Rozne ustawienia programu
-    public static String SCIEZKAMAPLAS = "/sdcard/MapLas6/";
+    public static String SCIEZKAMAPLAS = Environment.getExternalStorageDirectory().getPath() + "/MapLas6/";
     public static String FOLDERKOSZ = "Kosz";
     public static long CZASRETENCJIPLIKOW = 7L*24L*60L*60L*1000L;
     public static String ENTER = "\n";
@@ -56,7 +58,7 @@ public class Stale {
     public static int GPSREGISTERMETRYPIESZY = 10;
     public static int GPSREGISTERMETRYSAMOCHODOWY = 50;
 
-    public static String INSTRUKCJA = "1) Dwukrotkne dotknięcie w trybie mapy na środek powoduje przesunięcie mapy do aktualnej pozycji GPS" + ENTER + ENTER + "2) Kliknięcie na współrzędne GPS powoduje zmianę stylu wyświetlania informacji" + ENTER + ENTER + "3) Cyfra przy kompasie - dokładność, równa 3 jeśli kompas dobrze skalibrowany" + ENTER + ENTER + "4) Dlugie przycisniecie MENU - możliwość zakończenia trassy bez zapisywania";
+    public static String INSTRUKCJA = "1) Dwukrotkne dotknięcie w trybie mapy na środek powoduje przesunięcie mapy do aktualnej pozycji GPS" + ENTER + ENTER + "2) Kliknięcie na współrzędne GPS powoduje zmianę stylu wyświetlania informacji" + ENTER + ENTER + "3) Cyfra przy kompasie - dokładność, równa 3 jeśli kompas dobrze skalibrowany" + ENTER + ENTER + "4) Dlugie przycisniecie MENU - możliwość zakończenia trassy bez zapisywania" + ENTER + ENTER + "5) Aby wyszukiwanie folderów map działało w głównym katalogu partycji musi być folder MAPY";
 
     public static int GACCONNTIMEOUT = 5;
     public static int GACDATALIIT = 90000;
