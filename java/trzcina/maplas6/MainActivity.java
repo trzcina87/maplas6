@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     public MainSurface surface;
     public EditText wyslijurl;
     public EditText numertelefonu;
+    public EditText linkwsms;
     public TextView kontrasttextview;
     public SeekBar kontrastseekbar;
     public TextView nasycenietextview;
@@ -232,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
         nasycenieseekbar = (SeekBar) opcjepodstawowelayout.findViewById(R.id.nasycenieseekbar);
         wyslijurl = (EditText)opcjezaawansowanelayout.findViewById(R.id.wyslijurl);
         numertelefonu = (EditText)opcjezaawansowanelayout.findViewById(R.id.numertelefonu);
+        linkwsms = (EditText)opcjezaawansowanelayout.findViewById(R.id.linkwsms);
         imageviewinternet = (ImageView)maplayout.findViewById(R.id.imageviewinternet);
         layoutzgpstextview = (LinearLayout)maplayout.findViewById(R.id.layoutzgpstextview);
     }

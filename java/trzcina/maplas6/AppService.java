@@ -72,7 +72,7 @@ import trzcina.maplas6.watki.NotyfikacjaWatek;
 import trzcina.maplas6.watki.RysujWatek;
 import trzcina.maplas6.watki.WczytajWatek;
 
-@SuppressWarnings({"PointlessBooleanExpression", "MissingPermission"})
+@SuppressWarnings({"PointlessBooleanExpression", "MissingPermission", "RedundantStringConstructorCall"})
 public class AppService extends Service {
 
     public static AppService service;
@@ -138,7 +138,12 @@ public class AppService extends Service {
             }
             Uri smsuri = Uri.parse("smsto:" + telefon);
             Intent smsintent = new Intent(Intent.ACTION_SENDTO, smsuri);
-            smsintent.putExtra("sms_body", "Moja lokalizacja: " + Rozne.zaokraglij5((float) ostatnia.getLatitude()) + " " + Rozne.zaokraglij5((float) ostatnia.getLongitude()));
+            String y = String.valueOf(Rozne.zaokraglij5((float) ostatnia.getLatitude()));
+            String x = String.valueOf(Rozne.zaokraglij5((float) ostatnia.getLongitude()));
+            String link = new String(Ustawienia.linkwsms.wartosc);
+            link = link.replace("===YYY===", y);
+            link = link.replace("===XXX===", x);
+            smsintent.putExtra("sms_body", "Moja lokalizacja: " + y + " " + x + " " + link);
             smsintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(smsintent);
         }
