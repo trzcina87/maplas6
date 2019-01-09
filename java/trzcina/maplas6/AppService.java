@@ -958,6 +958,11 @@ public class AppService extends Service {
         odswiezUI();
     }
 
+    @Override
+    public void onCreate() {
+        startForeground(1, new Notification.Builder(this).build());
+    }
+
     //Serwis startuje (po starcie MainActivity)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
