@@ -885,7 +885,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Uruchamia glowny service aplikacji
     private void wysartujService() {
-        startService(new Intent(this, AppService.class));
+        startForegroundService(new Intent(this, AppService.class));
     }
 
     //Konczy dzialanie programu
