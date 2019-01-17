@@ -1,6 +1,8 @@
 package trzcina.maplas6;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -842,7 +844,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ustawTrybTelewizyjny() {
-        if(AppService.service.trybtelewizyjny == true) {
+        boolean trybtelewizyjny = false;
+        try {
+            trybtelewizyjny = AppService.service.trybtelewizyjny;
+        } catch(Exception e) {
+            trybtelewizyjny = false;
+        }
+        if(trybtelewizyjny == true) {
             luxtextview.setVisibility(View.INVISIBLE);
             satelitytextview.setVisibility(View.INVISIBLE);
             imageviewinternet.setVisibility(View.INVISIBLE);
@@ -890,6 +898,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Konczy dzialanie programu
     public void zakonczCalaAplikacje() {
+        AppService.service.stopForeground(true);
         stopService(new Intent(MainActivity.this, AppService.class));
         finish();
     }
@@ -998,11 +1007,21 @@ public class MainActivity extends AppCompatActivity {
         formatczasu.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
+    private void utworzKanalNotyfikacji() {
+        NotificationChannel channel = new NotificationChannel("NOTY", "Notyfikacje", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription("Wszystkie notyfikacje");
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
         activitywidoczne = true;
+
+        //Obsluga notyfikacji
+        utworzKanalNotyfikacji();
 
         //Obsluga elementow graficznych
         znajdzLayouty();
@@ -1024,6 +1043,9 @@ public class MainActivity extends AppCompatActivity {
         //Jesli sa uprawniania bez pytania usera to uruchamiamy aplikacje dalej
         if(Uprawnienia.czyNadane() == true) {
             wysartujService();
+        } else {
+            Toast.makeText(this, "Zainicjuj uprawninia i uruchom aplikację ponownie!", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 

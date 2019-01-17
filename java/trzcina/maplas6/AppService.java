@@ -18,22 +18,16 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,7 +36,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -691,8 +684,8 @@ public class AppService extends Service {
         widokmalejnotyfikacji.setImageViewResource(R.id.znaczniksmall, R.mipmap.znacznik2);
         widokmalejnotyfikacji.setImageViewResource(R.id.notyfikacjaikonasatelity, R.mipmap.satelitaczerwony);
         widokmalejnotyfikacji.setOnClickPendingIntent(R.id.znaczniksmall, pendingintenty[19]);
-        NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.mipmap.ikona);
-        builder = (NotificationCompat.Builder) builder.setCustomBigContentView(widoknotyfikacji).setContent(widokmalejnotyfikacji).setOngoing(true).setPriority(Notification.PRIORITY_MAX).setVisibility(Notification.VISIBILITY_PUBLIC);
+        Notification.Builder builder = (Notification.Builder) new Notification.Builder(getApplicationContext(), "NOTY").setSmallIcon(R.mipmap.ikona);
+        builder = (Notification.Builder) builder.setCustomBigContentView(widoknotyfikacji).setContent(widokmalejnotyfikacji).setOngoing(true).setPriority(Notification.PRIORITY_MAX).setVisibility(Notification.VISIBILITY_PUBLIC);
         notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notyfikacja = builder.build();
         notificationmanager.notify(numer, notyfikacja);
@@ -960,7 +953,10 @@ public class AppService extends Service {
 
     @Override
     public void onCreate() {
-        startForeground(1, new Notification.Builder(this).build());
+        Notification notification = new Notification.Builder(getApplicationContext(), "NOTY")
+                .setContentTitle(getString(R.string.app_name))
+                .build();
+        startForeground(1, notification);
     }
 
     //Serwis startuje (po starcie MainActivity)
